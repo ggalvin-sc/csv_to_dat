@@ -1,0 +1,19 @@
+# csv_to_dat header sidecar (NOT a Concordance CPL dictionary)
+# One field name per line; blank lines and # comments are ignored on read.
+BEGDOC
+ENDDOC
+BEGATTACH
+ENDATTACH
+CUSTODIAN
+FILEPATH
+FILENAME
+FILEEXT
+MD5
+DATESENT
+FROM
+TO
+CC
+BCC
+SUBJECT
+TEXTPATH
+NATIVEPATH

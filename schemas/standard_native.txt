@@ -1,0 +1,20 @@
+# Standard native load-file schema for --merge-schema.
+# One field name per line. Blank lines and # comments are ignored.
+BEGDOC
+ENDDOC
+BEGATTACH
+ENDATTACH
+CUSTODIAN
+CODED
+FILEPATH
+FILENAME
+FILEEXT
+MD5
+DATESENT
+FROM
+TO
+CC
+BCC
+SUBJECT
+TEXTPATH
+NATIVEPATH

@@ -1,0 +1,4 @@
+# csv_to_dat runtime dependencies: none (Python 3.8+ standard library only).
+#
+# Optional test dependency:
+pytest>=7.0

@@ -1,0 +1,50 @@
+﻿[
+    {
+        "name":  "sample-esi-questionnaire.docx",
+        "path":  "samples/sample-esi-questionnaire.docx",
+        "sha":  "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "size":  0,
+        "url":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/contents/samples/sample-esi-questionnaire.docx?ref=main",
+        "html_url":  "https://github.com/pmdenlinger/ediscovery-starter/blob/main/samples/sample-esi-questionnaire.docx",
+        "git_url":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "download_url":  "https://raw.githubusercontent.com/pmdenlinger/ediscovery-starter/main/samples/sample-esi-questionnaire.docx",
+        "type":  "file",
+        "_links":  {
+                       "self":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/contents/samples/sample-esi-questionnaire.docx?ref=main",
+                       "git":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+                       "html":  "https://github.com/pmdenlinger/ediscovery-starter/blob/main/samples/sample-esi-questionnaire.docx"
+                   }
+    },
+    {
+        "name":  "sample-loadfile",
+        "path":  "samples/sample-loadfile",
+        "sha":  "be03f7bdccd4eb4b79950dcc37c7c719a1ee4339",
+        "size":  0,
+        "url":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/contents/samples/sample-loadfile?ref=main",
+        "html_url":  "https://github.com/pmdenlinger/ediscovery-starter/tree/main/samples/sample-loadfile",
+        "git_url":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/git/trees/be03f7bdccd4eb4b79950dcc37c7c719a1ee4339",
+        "download_url":  null,
+        "type":  "dir",
+        "_links":  {
+                       "self":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/contents/samples/sample-loadfile?ref=main",
+                       "git":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/git/trees/be03f7bdccd4eb4b79950dcc37c7c719a1ee4339",
+                       "html":  "https://github.com/pmdenlinger/ediscovery-starter/tree/main/samples/sample-loadfile"
+                   }
+    },
+    {
+        "name":  "sample-production-cover-letter.md",
+        "path":  "samples/sample-production-cover-letter.md",
+        "sha":  "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "size":  0,
+        "url":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/contents/samples/sample-production-cover-letter.md?ref=main",
+        "html_url":  "https://github.com/pmdenlinger/ediscovery-starter/blob/main/samples/sample-production-cover-letter.md",
+        "git_url":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "download_url":  "https://raw.githubusercontent.com/pmdenlinger/ediscovery-starter/main/samples/sample-production-cover-letter.md",
+        "type":  "file",
+        "_links":  {
+                       "self":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/contents/samples/sample-production-cover-letter.md?ref=main",
+                       "git":  "https://api.github.com/repos/pmdenlinger/ediscovery-starter/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+                       "html":  "https://github.com/pmdenlinger/ediscovery-starter/blob/main/samples/sample-production-cover-letter.md"
+                   }
+    }
+]

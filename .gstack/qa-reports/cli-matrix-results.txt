@@ -1,0 +1,25 @@
+passed=23 total=23 findings=1
+PASS	unit_suite	
+PASS	cli_help	
+PASS	cli_csv2dat_fixture	
+PASS	cli_roundtrip_fixture	
+PASS	cli_dat2csv	
+PASS	full_sample	
+PASS	cli_missing_input	
+PASS	cli_field_names_mismatch	
+PASS	cli_field_names_file	
+PASS	cli_field_name_comma_via_file	
+PASS	overlong_row_cli	
+PASS	emoji_strict_cli	
+PASS	emoji_replace_cli	
+PASS	utf8_dat_explicit	
+PASS	no_dct_flag	
+PASS	crlf_terminator	
+PASS	empty_csv_cli	
+PASS	reject_mode	
+PASS	pad_truncate_mode	
+PASS	multivalue_normalization	
+PASS	smart_quote_cp1252	
+PASS	help_mentions_dat	
+PASS	dat2csv_wrong_encoding	
+FINDING	medium	QA-001	python -m csv_to_dat fails when cwd is the package directory	stderr=C:\Users\gregg\anaconda3\python.exe: No module named csv_to_dat

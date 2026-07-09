@@ -1,0 +1,37 @@
+# .github/workflows/ci.yml - Continuous integration for csv_to_dat
+#
+# WHAT THIS WORKFLOW DOES
+# -----------------------
+# On push/PR: run the stdlib unittest suite on Windows + Ubuntu across
+# Python 3.8–3.12. No third-party runtime deps; pytest is optional.
+
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.8", "3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run unit tests
+        run: python tests/test_roundtrip.py
+      - name: CLI smoke (run.py)
+        shell: bash
+        run: |
+          python run.py --help
+          python run.py csv2dat tests/fixtures/VOL001_slice.csv /tmp/out.dat --field-names BEGDOC,ENDDOC,CODED,FILEPATH
+          python run.py validate /tmp/out.dat --field-names BEGDOC,ENDDOC,CODED,FILEPATH
+          python run.py opt /tmp/out.dat /tmp/out.opt --volume VOL001 --image-dir IMAGES/001
+          python run.py roundtrip --direction csv2dat tests/fixtures/VOL001_slice.csv --field-names BEGDOC,ENDDOC,CODED,FILEPATH

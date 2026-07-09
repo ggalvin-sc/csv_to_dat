@@ -1,0 +1,51 @@
+# pyproject.toml - packaging metadata for csv_to_dat
+#
+# WHAT THIS FILE DOES
+# -------------------
+# Declares the package for pip install / editable install and registers the
+# `csv-to-dat` console script so the CLI is available on PATH after install.
+# Runtime dependencies: none (Python 3.8+ stdlib only).
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csv-to-dat"
+version = "1.1.0"
+description = "Concordance DAT <-> CSV converter for legal eDiscovery load files"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "GLG / Casedoxx" }]
+keywords = ["ediscovery", "concordance", "dat", "opticon", "relativity", "load-file"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Text Processing",
+  "Intended Audience :: Legal Industry",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+
+[project.scripts]
+csv-to-dat = "csv_to_dat.cli:main"
+
+[tool.setuptools]
+packages = ["csv_to_dat"]
+py-modules = []
+
+# When this folder IS the package (workspace root = csv_to_dat/), setuptools
+# needs package-dir mapping so `csv_to_dat` resolves to the current directory.
+[tool.setuptools.package-dir]
+"csv_to_dat" = "."
+
+[tool.setuptools.package-data]
+csv_to_dat = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,1354 @@
+﻿{
+    "sha":  "51e9a3479810b670d4db41063f7ae6d99d2e9788",
+    "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/51e9a3479810b670d4db41063f7ae6d99d2e9788",
+    "tree":  [
+                 {
+                     "path":  ".github",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "9b1c2ed4bb687a84374d5dd288890d6ea1d1f732",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/9b1c2ed4bb687a84374d5dd288890d6ea1d1f732"
+                 },
+                 {
+                     "path":  ".github/workflows",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "2c9ae66932bbc572b9465a68b1df77db1ce08f38",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/2c9ae66932bbc572b9465a68b1df77db1ce08f38"
+                 },
+                 {
+                     "path":  ".github/workflows/dotnet.yml",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "d960db28982b6d70da6b3703bbf6de3ae399eea1",
+                     "size":  705,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/d960db28982b6d70da6b3703bbf6de3ae399eea1"
+                 },
+                 {
+                     "path":  ".github/workflows/msbuild.yml",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "282a366c5355349bb3d5743f48bed0eae0dcc65b",
+                     "size":  1427,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/282a366c5355349bb3d5743f48bed0eae0dcc65b"
+                 },
+                 {
+                     "path":  ".gitignore",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "9b3d8aeae4bd568b9585e48a93dee763571620bf",
+                     "size":  37,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/9b3d8aeae4bd568b9585e48a93dee763571620bf"
+                 },
+                 {
+                     "path":  "CODEOWNERS",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "8a0e015703646094a9c88f06ac6b289d8251b324",
+                     "size":  353,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/8a0e015703646094a9c88f06ac6b289d8251b324"
+                 },
+                 {
+                     "path":  "LICENSE",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "bd7748ae097a5b7876a9e2eb173319a564c67d41",
+                     "size":  2636,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/bd7748ae097a5b7876a9e2eb173319a564c67d41"
+                 },
+                 {
+                     "path":  "OpenAPI",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "96440cac11d76700e44ed1d95b22f9e4c69c0e24",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/96440cac11d76700e44ed1d95b22f9e4c69c0e24"
+                 },
+                 {
+                     "path":  "OpenAPI/openapidoc.json",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "812a3c3f6eebdd77c6a339bb88b9f90be51d809f",
+                     "size":  58035,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/812a3c3f6eebdd77c6a339bb88b9f90be51d809f"
+                 },
+                 {
+                     "path":  "README.md",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "7110d77c7a57b6923c81df7b1359de12f718561d",
+                     "size":  61403,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/7110d77c7a57b6923c81df7b1359de12f718561d"
+                 },
+                 {
+                     "path":  "SampleDataSources",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "50b8a44542c9fad1edc4921c0905f1d3ebac6c1e",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/50b8a44542c9fad1edc4921c0905f1d3ebac6c1e"
+                 },
+                 {
+                     "path":  "SampleDataSources/Opticon_01.opt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "6a49b2dcd131caec1c6b9cfc95efbe45e6b261ce",
+                     "size":  397,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/6a49b2dcd131caec1c6b9cfc95efbe45e6b261ce"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "b1950197c90be030e9a44015df57ac880f35feaa",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/b1950197c90be030e9a44015df57ac880f35feaa"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "c9501e0959358c03a483c3729dd4ac6899466331",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/c9501e0959358c03a483c3729dd4ac6899466331"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "fb480e1f1ed0aa69b8f5225fd80cccaff917c124",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/fb480e1f1ed0aa69b8f5225fd80cccaff917c124"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001/SYM-00011001_0001_REV.tif",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "1185a68f690429bbc1a18e65a4cf464f57a2da72",
+                     "size":  340164,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/1185a68f690429bbc1a18e65a4cf464f57a2da72"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001/SYM-00011001_0002_REV.tif",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "49146a7cc8f694d12cdccb9df091034811255d94",
+                     "size":  274483,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/49146a7cc8f694d12cdccb9df091034811255d94"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001/SYM-00011001_0003_REV.tif",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "0d1bf3ff552a5cd79bbd0a0802f819b0fe12f437",
+                     "size":  121234,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/0d1bf3ff552a5cd79bbd0a0802f819b0fe12f437"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001/SYM-00011001_0004_REV.tif",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "49146a7cc8f694d12cdccb9df091034811255d94",
+                     "size":  274483,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/49146a7cc8f694d12cdccb9df091034811255d94"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001/SYM-00011001_REV.tif",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "b3daa403da9fb62b0fb304b0a4ae9760a44086fb",
+                     "size":  17256,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/b3daa403da9fb62b0fb304b0a4ae9760a44086fb"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001/SYM-00011001_REV.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "31afec638d5cae18427a0508ef2d5269ebfb94bc",
+                     "size":  31,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/31afec638d5cae18427a0508ef2d5269ebfb94bc"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/IMAGES/IMG001/TextAsTiffFile.tif",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "9dbfeeee58391ca9f5112bb87d9c2a62f5f7cba5",
+                     "size":  9,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/9dbfeeee58391ca9f5112bb87d9c2a62f5f7cba5"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "31ec9b00e69313e3b3a799e56b8995efa4277248",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/31ec9b00e69313e3b3a799e56b8995efa4277248"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "35ae15cc3f2d64ddb6f045f363094e5ae4636dc0",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/35ae15cc3f2d64ddb6f045f363094e5ae4636dc0"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample1.pdf",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "a766d3f8574dd1a36dd6ad6550b04040c425f002",
+                     "size":  52048,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/a766d3f8574dd1a36dd6ad6550b04040c425f002"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample10.wmf",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "389411f589ff2e7459144ac7f79fd3c87f0a64b5",
+                     "size":  13782,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/389411f589ff2e7459144ac7f79fd3c87f0a64b5"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample2.doc",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "6ac4ccb0c825b4df4f102c1d0f5a4d2163300060",
+                     "size":  19456,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/6ac4ccb0c825b4df4f102c1d0f5a4d2163300060"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample3.xlsx",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ae711c922009050f207d4fbd73ad27b2c5da856a",
+                     "size":  17922,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ae711c922009050f207d4fbd73ad27b2c5da856a"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample4.msg",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "c82778b53b9da7c39191f7a6f0316f77a7ffca84",
+                     "size":  25088,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/c82778b53b9da7c39191f7a6f0316f77a7ffca84"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample5.htm",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "e2d08c4eaeedbc5ba944173ca5c7325a289c2598",
+                     "size":  4030,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/e2d08c4eaeedbc5ba944173ca5c7325a289c2598"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample6.emf",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ea962062419e2eed5b478947f0a3bccf30a6070b",
+                     "size":  5264,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ea962062419e2eed5b478947f0a3bccf30a6070b"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample7.ppt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "8146910767c2c3412fbd59e1178c9b743419d067",
+                     "size":  280064,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/8146910767c2c3412fbd59e1178c9b743419d067"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample8.png",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "607e1136e5bc5fdf0af3d4bfd4741c09ec8b021f",
+                     "size":  4286,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/607e1136e5bc5fdf0af3d4bfd4741c09ec8b021f"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/NATIVES/NATIVE00001/EDRM-Sample9.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "5de492404db0c48d51bbb359542b99e644fb55bf",
+                     "size":  118,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/5de492404db0c48d51bbb359542b99e644fb55bf"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "4997fdb727dfbef9e2714e7846c40fa9775aa040",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/4997fdb727dfbef9e2714e7846c40fa9775aa040"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "1b1569cd75501498bd25a7669999e4c9ef8531c1",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/1b1569cd75501498bd25a7669999e4c9ef8531c1"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample1.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "9d298f744665fad7df1dfffe5bdbe899ef2e6a3b",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/9d298f744665fad7df1dfffe5bdbe899ef2e6a3b"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample10.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "c21b757c352a659c4e653f7712b0d90fd80c5499",
+                     "size":  43,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/c21b757c352a659c4e653f7712b0d90fd80c5499"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample2.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "11a8cc9bc1ea9c054c0d252e6a2cd93f6805f039",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/11a8cc9bc1ea9c054c0d252e6a2cd93f6805f039"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample3.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "e11c58533d87d696b5099f51cf74db4fc0a60548",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/e11c58533d87d696b5099f51cf74db4fc0a60548"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample4.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "f990b97bee99b1072fa9d85e57edd378f11879bd",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/f990b97bee99b1072fa9d85e57edd378f11879bd"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample5.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "0b8bab203e05fd1501b4a0c40416a29597c1cdf9",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/0b8bab203e05fd1501b4a0c40416a29597c1cdf9"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample6.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "b951bff205a0c73068538966724bb4a9a7d167e2",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/b951bff205a0c73068538966724bb4a9a7d167e2"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample7.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "3404aa5ce7e785f4a649c7929154931f56288f02",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/3404aa5ce7e785f4a649c7929154931f56288f02"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample8.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "703a398a621877b89123f7cc9ac6f05c53b01cf3",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/703a398a621877b89123f7cc9ac6f05c53b01cf3"
+                 },
+                 {
+                     "path":  "SampleDataSources/VOL01/TEXT/TEXT00001/EDRM-Sample9.txt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "e935b2e22a406b6db8e321a6bf51883f2822a31f",
+                     "size":  42,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/e935b2e22a406b6db8e321a6bf51883f2822a31f"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_01.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "c3d8051e020a4e4d6dafd17e847cf819e12b079a",
+                     "size":  1771,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/c3d8051e020a4e4d6dafd17e847cf819e12b079a"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_02.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "0a7f29e16ea31869c50080937b212810c91c16a8",
+                     "size":  717,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/0a7f29e16ea31869c50080937b212810c91c16a8"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_03.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "756476493da7b83cd428e606ec8899dc6dc330f7",
+                     "size":  733,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/756476493da7b83cd428e606ec8899dc6dc330f7"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_04.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "68ddd5950963b203650664df8223cc10d5edcb83",
+                     "size":  1043,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/68ddd5950963b203650664df8223cc10d5edcb83"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_05.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "7493fd470901fd31c352fee6d6248f1766177b7f",
+                     "size":  1775,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/7493fd470901fd31c352fee6d6248f1766177b7f"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_0.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "418f7afc89b4a0d45b8dd9290601ecf226e865f4",
+                     "size":  4395,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/418f7afc89b4a0d45b8dd9290601ecf226e865f4"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_1.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4b275822f7bf174b66ccb64dd709c7a5ce09b1a9",
+                     "size":  4393,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4b275822f7bf174b66ccb64dd709c7a5ce09b1a9"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_2.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4b275822f7bf174b66ccb64dd709c7a5ce09b1a9",
+                     "size":  4393,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4b275822f7bf174b66ccb64dd709c7a5ce09b1a9"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_3.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4b275822f7bf174b66ccb64dd709c7a5ce09b1a9",
+                     "size":  4393,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4b275822f7bf174b66ccb64dd709c7a5ce09b1a9"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_4.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4b275822f7bf174b66ccb64dd709c7a5ce09b1a9",
+                     "size":  4393,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4b275822f7bf174b66ccb64dd709c7a5ce09b1a9"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_5.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4b275822f7bf174b66ccb64dd709c7a5ce09b1a9",
+                     "size":  4393,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4b275822f7bf174b66ccb64dd709c7a5ce09b1a9"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_6.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4b275822f7bf174b66ccb64dd709c7a5ce09b1a9",
+                     "size":  4393,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4b275822f7bf174b66ccb64dd709c7a5ce09b1a9"
+                 },
+                 {
+                     "path":  "SampleDataSources/load_file_07_7.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4b275822f7bf174b66ccb64dd709c7a5ce09b1a9",
+                     "size":  4393,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4b275822f7bf174b66ccb64dd709c7a5ce09b1a9"
+                 },
+                 {
+                     "path":  "SampleDataSources/opticon_02.opt",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "dcbb737c40810f2d0030133fc4069d41b7400e05",
+                     "size":  402,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/dcbb737c40810f2d0030133fc4069d41b7400e05"
+                 },
+                 {
+                     "path":  "SampleDataSources/rdo_load_file_01.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "b4c45752ef53ca053defe4361dd96b5672aa8466",
+                     "size":  448,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/b4c45752ef53ca053defe4361dd96b5672aa8466"
+                 },
+                 {
+                     "path":  "SampleDataSources/rdo_load_file_02.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "1995d326ad69a49f14de8c90f93c539d70aa70df",
+                     "size":  400,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/1995d326ad69a49f14de8c90f93c539d70aa70df"
+                 },
+                 {
+                     "path":  "SampleDataSources/rdo_load_file_03.dat",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "1d93df00bada22463b9a80649feeaaaaf5ae38fd",
+                     "size":  166,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/1d93df00bada22463b9a80649feeaaaaf5ae38fd"
+                 },
+                 {
+                     "path":  "Samples",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "fb0cf9cdf59dba42e6bfef3f700ba078d60b5fcd",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/fb0cf9cdf59dba42e6bfef3f700ba078d60b5fcd"
+                 },
+                 {
+                     "path":  "Samples/.editorconfig",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ae6d95b68d2b8b744e110f2e123903db172f9f35",
+                     "size":  134,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ae6d95b68d2b8b744e110f2e123903db172f9f35"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "3b14afa203ba460872c553b4ac18534f9d512c99",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/3b14afa203ba460872c553b4ac18534f9d512c99"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Helpers",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "f8a4e292fa53f55b355dbff967c6973d6cee4ae2",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/f8a4e292fa53f55b355dbff967c6973d6cee4ae2"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Helpers/Authorization.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "8b90db6bce7a097e5e6c4dfdc6bcf79a61262a4d",
+                     "size":  1185,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/8b90db6bce7a097e5e6c4dfdc6bcf79a61262a4d"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Helpers/HttpClientHelper.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "63416e7ac4d63248f76f68c694fa68cd20893450",
+                     "size":  2387,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/63416e7ac4d63248f76f68c694fa68cd20893450"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Helpers/ImportJobSampleHelper.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "169d97412bcda4cd686bb410a5e7657a5ac06943",
+                     "size":  5305,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/169d97412bcda4cd686bb410a5e7657a5ac06943"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Helpers/RelativityImportEndpoints.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "97494bba20258e7fab7f26985256c3a7ff65e282",
+                     "size":  8560,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/97494bba20258e7fab7f26985256c3a7ff65e282"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Helpers/RelativityUserSettings.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ec613faf00d8f96bf55f6c947de5409aedea1a4f",
+                     "size":  675,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ec613faf00d8f96bf55f6c947de5409aedea1a4f"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Program.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "75bb98aca0aa18614af9b7c6db888bdd1947834a",
+                     "size":  2767,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/75bb98aca0aa18614af9b7c6db888bdd1947834a"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/Relativity.Import.Samples.DotNetClient.csproj",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "3a63a9fee837b89f9f559e61599640d4f5f36abd",
+                     "size":  1045,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/3a63a9fee837b89f9f559e61599640d4f5f36abd"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "62928a9a2d24822f123a557731b894f44a66efdd",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/62928a9a2d24822f123a557731b894f44a66efdd"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample01_ImportNativeFiles.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "5dca8a88f98ef27749fb6f7c9abc63ba19f3b0d6",
+                     "size":  6922,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/5dca8a88f98ef27749fb6f7c9abc63ba19f3b0d6"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample02_ImportDocumentsInOverlayMode.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "f07c9b961e265228b65c9c915aa691ace4460d2e",
+                     "size":  7172,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/f07c9b961e265228b65c9c915aa691ace4460d2e"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample03_ImportFromTwoDataSources.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "e10769000b059b984362d9e73c0c49462725939c",
+                     "size":  8138,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/e10769000b059b984362d9e73c0c49462725939c"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample04_AddDataSourceToRunningJob.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "30244933b1c6ac36ad546de5534460c8ba37ef33",
+                     "size":  8141,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/30244933b1c6ac36ad546de5534460c8ba37ef33"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample05_ImportDocumentsWithExtractedText.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "f0c8fad71191dfc2ea8db5e4b427785cf5f071e2",
+                     "size":  6878,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/f0c8fad71191dfc2ea8db5e4b427785cf5f071e2"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample06_ImportDocumentsToSelectedFolder.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "8c9f345bd27e734c6b480492d80891ab5e8ef251",
+                     "size":  6816,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/8c9f345bd27e734c6b480492d80891ab5e8ef251"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample07_DirectImportSettingsForDocuments.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ac35183e51cf9da960cb3fc75560941d05fd8ac5",
+                     "size":  7838,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ac35183e51cf9da960cb3fc75560941d05fd8ac5"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample08_ImportImages.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "64a3b337639d5fcf2109007d87bb25dddd059b1f",
+                     "size":  6285,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/64a3b337639d5fcf2109007d87bb25dddd059b1f"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample09_ImportProductionFiles.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4d90cabdf744dbfdce8be29ec5a54edcea955429",
+                     "size":  6537,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4d90cabdf744dbfdce8be29ec5a54edcea955429"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample10_ImportImagesInAppendOverlayMode.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "767b031c3d38b4ad0f2281fa618ca38fe9fb6206",
+                     "size":  6431,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/767b031c3d38b4ad0f2281fa618ca38fe9fb6206"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample11_DirectImportSettingsForImages.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "a71bd54640127b5535ec9ae84be76316e99e3f1c",
+                     "size":  6699,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/a71bd54640127b5535ec9ae84be76316e99e3f1c"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample12_ImportRelativityDynamicObject.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "26e4db55f106ea07c5c1bde6db08beca0a78c366",
+                     "size":  7079,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/26e4db55f106ea07c5c1bde6db08beca0a78c366"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample13_ImportRdoWithParent.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "0e624bd79a82c78202f6ff792e9897e232024c49",
+                     "size":  6636,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/0e624bd79a82c78202f6ff792e9897e232024c49"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample14_DirectImportSettingsForRdo.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "1b8d05133daab11ca8cb675e5a833adb3fe2787f",
+                     "size":  7752,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/1b8d05133daab11ca8cb675e5a833adb3fe2787f"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample15_ReadImportRdoSettings.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "7715ae8d9ad733cccdbe52ede5f144d9daad62ae",
+                     "size":  3342,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/7715ae8d9ad733cccdbe52ede5f144d9daad62ae"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample16_ReadImportDocumentSettings.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "0247120c65c967dd9d16585b533b9089bc37829b",
+                     "size":  4332,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/0247120c65c967dd9d16585b533b9089bc37829b"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample17_GetImportJobs.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "cb47244fe67742e20cbbedb9fd6820d78bffab13",
+                     "size":  3284,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/cb47244fe67742e20cbbedb9fd6820d78bffab13"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample18_GetDataSource.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "25c43b87943c9067cb5a18d09a38fea38785eb4f",
+                     "size":  5076,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/25c43b87943c9067cb5a18d09a38fea38785eb4f"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample19_GetImportJobDetailsAndProgress.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "3f86117e16291e9e7117f436db74b17c30e4f4b3",
+                     "size":  6944,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/3f86117e16291e9e7117f436db74b17c30e4f4b3"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample20_GetDataSourceDetailsAndProgress.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "362fdbecb8b2f3f9ee20fa586ec10daf2bd6e2f0",
+                     "size":  7102,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/362fdbecb8b2f3f9ee20fa586ec10daf2bd6e2f0"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample21_CancelStartedJob.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4f67bad79349582689990ef7b1dc47240cde7462",
+                     "size":  5947,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4f67bad79349582689990ef7b1dc47240cde7462"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample22_ReadResponse.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "959c19dfe9c199da0656012d3a08ba8d3fe8c60e",
+                     "size":  6156,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/959c19dfe9c199da0656012d3a08ba8d3fe8c60e"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample23_GetDataSourceErrors.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "86cbaa390796a00b3a49777c3c5b69452c81e589",
+                     "size":  12003,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/86cbaa390796a00b3a49777c3c5b69452c81e589"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample24_DeleteSource.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "003b10b619a4428d515627b5b32ab489e50fbcb0",
+                     "size":  1321,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/003b10b619a4428d515627b5b32ab489e50fbcb0"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample25_GetLocation_Job.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "5e6c21b46571dc8281c204fae7d272a1d5e92806",
+                     "size":  1284,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/5e6c21b46571dc8281c204fae7d272a1d5e92806"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/SampleCollection/Sample26_GetLocation_Workspace.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ac0698c89ee2bf61eb3fe3aebd83b4025be285b2",
+                     "size":  1219,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ac0698c89ee2bf61eb3fe3aebd83b4025be285b2"
+                 },
+                 {
+                     "path":  "Samples/DotNetClientConsole/stylecop.json",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "3cbf1126202b9a9c5139f767f72ab914a99110ab",
+                     "size":  395,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/3cbf1126202b9a9c5139f767f72ab914a99110ab"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "c856985060f72a881bf82432cbb72252dca3baef",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/c856985060f72a881bf82432cbb72252dca3baef"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/ImportSampleHelpers",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "ca75d6b5d24b8b7ea62b275e404838e9d0c9b383",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/ca75d6b5d24b8b7ea62b275e404838e9d0c9b383"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/ImportSampleHelpers/KeplerProxyHelper.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "c0dcafe9ac41e9ec763bf41aea6f867dce5e74ee",
+                     "size":  1243,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/c0dcafe9ac41e9ec763bf41aea6f867dce5e74ee"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/ImportSampleHelpers/RelativityUserSettings.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "d738379f8774c6aa28271c9ee3293e8c14d2bf0e",
+                     "size":  694,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/d738379f8774c6aa28271c9ee3293e8c14d2bf0e"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/ImportSampleHelpers/ResponseHelper.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "1838bd431233f45fb04e8e175716706064b50979",
+                     "size":  1501,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/1838bd431233f45fb04e8e175716706064b50979"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/Program.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "6ec51d956c281803c8c1547f7cc3c295aa7df47b",
+                     "size":  2720,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/6ec51d956c281803c8c1547f7cc3c295aa7df47b"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/Relativity.Import.Samples.DotNetFrameworkClient.csproj",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "388e69ce41e62756048171153103a81a055f69d6",
+                     "size":  963,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/388e69ce41e62756048171153103a81a055f69d6"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "e0461b05b3d429dc093066af563cc77e4dbbdf5b",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/e0461b05b3d429dc093066af563cc77e4dbbdf5b"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/ImportServiceSample.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "d7233c0a146012910de0ec8a1fbc0c1cd39fa9da",
+                     "size":  2333,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/d7233c0a146012910de0ec8a1fbc0c1cd39fa9da"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample01_ImportNativeFiles.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ca693a14765941609204bbcc01c04c6d4e596e45",
+                     "size":  5911,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ca693a14765941609204bbcc01c04c6d4e596e45"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample02_ImportDocumentsInOverlayMode.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "633199afe0c6fe8fe146ff83e30ba4e5f1653ae4",
+                     "size":  6178,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/633199afe0c6fe8fe146ff83e30ba4e5f1653ae4"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample03_ImportFromTwoDataSources.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "49b024ee2671a22d4e2eef220ae51325342e8ea4",
+                     "size":  6902,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/49b024ee2671a22d4e2eef220ae51325342e8ea4"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample04_AddDataSourceToRunningJob.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "f6970a0167ee9e20c832e584b16ad756820c0fb1",
+                     "size":  7138,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/f6970a0167ee9e20c832e584b16ad756820c0fb1"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample05_ImportDocumentsWithExtractedText.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "97e7c019286fe957b5bc8ddab5c42e567e3cf7eb",
+                     "size":  5837,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/97e7c019286fe957b5bc8ddab5c42e567e3cf7eb"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample06_ImportDocumentsToSelectedFolder.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4cf15c3798c1a0e37d872c25417a52d4e022f5fa",
+                     "size":  5695,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4cf15c3798c1a0e37d872c25417a52d4e022f5fa"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample07_DirectImportSettingsForDocuments.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "cd3b62d08335222d48e057a810d51b779e1bc39a",
+                     "size":  6593,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/cd3b62d08335222d48e057a810d51b779e1bc39a"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample08_ImportImages.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4ea5536bf4a9720debd2131ed3df62d3d469fc74",
+                     "size":  5150,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4ea5536bf4a9720debd2131ed3df62d3d469fc74"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample09_ImportProductionFiles.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "7f1bec72bde3182c261a53fb728018c432d9e9e6",
+                     "size":  5247,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/7f1bec72bde3182c261a53fb728018c432d9e9e6"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample10_ImportImagesInAppendOverlayMode.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "ee54307193a7323cbaa5ae1ecf7402395ecea8a3",
+                     "size":  5157,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/ee54307193a7323cbaa5ae1ecf7402395ecea8a3"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample11_DirectImportSettingsForImages.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "f348fd9451ee8c80030345b25568e36effd69724",
+                     "size":  5556,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/f348fd9451ee8c80030345b25568e36effd69724"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample12_ImportRelativityDynamicObject.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "afb85b54602f4d8e510d79f13b8d0dcf68cdbc30",
+                     "size":  5778,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/afb85b54602f4d8e510d79f13b8d0dcf68cdbc30"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample13_ImportRdoWithParent.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "1b642b09e93a273f2ad5e7beab1b710422c2db92",
+                     "size":  5150,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/1b642b09e93a273f2ad5e7beab1b710422c2db92"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample14_DirectImportSettingsForRdo.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "e92b4ab1f0a1bddf5bdc9a35d352dc14daa4d99b",
+                     "size":  6379,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/e92b4ab1f0a1bddf5bdc9a35d352dc14daa4d99b"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample15_ReadImportRdoSettings.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "bd7694837d25f43e42ded9b22431e9f4b30c9689",
+                     "size":  3096,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/bd7694837d25f43e42ded9b22431e9f4b30c9689"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample16_ReadImportDocumentSettings.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "7a949b5e674f349020938d63c7fd84d5c4945842",
+                     "size":  4096,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/7a949b5e674f349020938d63c7fd84d5c4945842"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample17_GetImportJobs.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "e77d3fd1f810d5f40a47451e657bd91a3ecc747b",
+                     "size":  3522,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/e77d3fd1f810d5f40a47451e657bd91a3ecc747b"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample18_GetDataSource.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "8a5a2627ba207dd7317739385ecb27c3a91ac5fb",
+                     "size":  4733,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/8a5a2627ba207dd7317739385ecb27c3a91ac5fb"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample19_GetImportJobDetailsAndProgress.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "717abe330238dc29b617439aa96236c943533c35",
+                     "size":  6282,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/717abe330238dc29b617439aa96236c943533c35"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample20_GetDataSourceDetailsAndProgress.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "2f6a019ef7753972a833ee7be76ea3f7c38daf7c",
+                     "size":  6074,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/2f6a019ef7753972a833ee7be76ea3f7c38daf7c"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample21_CancelStartedJob.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "7783c2075d59dcfb461c21565a0f55af4b40f1ff",
+                     "size":  5075,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/7783c2075d59dcfb461c21565a0f55af4b40f1ff"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample22_ReadResponse.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "c7839e89913b3abd9fa1596ba81b404f40a4f2ab",
+                     "size":  4822,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/c7839e89913b3abd9fa1596ba81b404f40a4f2ab"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample23_GetDataSourceErrors.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "2e39ce2a38f7356519b4e5f0ee2a1175e71f963f",
+                     "size":  10447,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/2e39ce2a38f7356519b4e5f0ee2a1175e71f963f"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample24_DeleteSource.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "364bd2ca9e2eb9df08fd00538e2ee831c7ee04be",
+                     "size":  1669,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/364bd2ca9e2eb9df08fd00538e2ee831c7ee04be"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample25_GetLocation_Job.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "3e357a23ab5c28e541d0996f7210fbbb651262d6",
+                     "size":  1440,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/3e357a23ab5c28e541d0996f7210fbbb651262d6"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/SamplesCollection/Sample26_GetLocation_Workspace.cs",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "6bf91077222320d43b6100f087484d3e315bbe61",
+                     "size":  1379,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/6bf91077222320d43b6100f087484d3e315bbe61"
+                 },
+                 {
+                     "path":  "Samples/KeplerClientConsole/stylecop.json",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "b6e3d759efcc3b4407d9963cbb722695f9c43347",
+                     "size":  408,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/b6e3d759efcc3b4407d9963cbb722695f9c43347"
+                 },
+                 {
+                     "path":  "Samples/RestSamples",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "2a5337a5963bc903b285d7207e666d350662dcec",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/2a5337a5963bc903b285d7207e666d350662dcec"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/Helpers",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "4a8654254a4a6bbea14694f1ba10458f302ef50b",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/4a8654254a4a6bbea14694f1ba10458f302ef50b"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/Helpers/AuthClass.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "97ececea5f98cb74bd53b93c51044a9bcb42f398",
+                     "size":  999,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/97ececea5f98cb74bd53b93c51044a9bcb42f398"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/Helpers/EndpointsClass.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4e15843a447bd9fe76ab532c3d8bd731864e19b5",
+                     "size":  2082,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4e15843a447bd9fe76ab532c3d8bd731864e19b5"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/Helpers/WebRequestClass.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "72bcec9be64ad4886930e9c86d9b5ca8b5b29186",
+                     "size":  2136,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/72bcec9be64ad4886930e9c86d9b5ca8b5b29186"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/Helpers/WriteInformationClass.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "96351b1a935fe863a807bbb74d769e796d0f92c0",
+                     "size":  1704,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/96351b1a935fe863a807bbb74d769e796d0f92c0"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection",
+                     "mode":  "040000",
+                     "type":  "tree",
+                     "sha":  "1222e2675008ed5177603caaf05dd82c46bcd483",
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/trees/1222e2675008ed5177603caaf05dd82c46bcd483"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample01-import-native-files.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "414a15fc3c4b52ccf43b26fa7a777fa541a705fb",
+                     "size":  5746,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/414a15fc3c4b52ccf43b26fa7a777fa541a705fb"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample02-import-documents-in-overlay-mode.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "d7d0703823fa978f2136cce7beaea6cc17166b1c",
+                     "size":  6210,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/d7d0703823fa978f2136cce7beaea6cc17166b1c"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample03-import-from-two-data-sources.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "c4d746180c029ba4e278feaea8ef79c1e9b99692",
+                     "size":  6710,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/c4d746180c029ba4e278feaea8ef79c1e9b99692"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample04-add-data-source-to-running-job.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "b75077b5089daac57d6226ab9eeb9dfb66d5cf29",
+                     "size":  6723,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/b75077b5089daac57d6226ab9eeb9dfb66d5cf29"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample05-import-documents-with-extracted-text.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "0e602dcc02e16a36016f46c88f5068c7e59c89a0",
+                     "size":  5479,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/0e602dcc02e16a36016f46c88f5068c7e59c89a0"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample06-import-documents-to-selected-folder.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "554d0bbf86fde798bc91b99e4b50f3fed14071ae",
+                     "size":  5178,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/554d0bbf86fde798bc91b99e4b50f3fed14071ae"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample07-direct-import-settings-for-documents.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "322fea23262283c84b1d8111802615bee7d502cb",
+                     "size":  6136,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/322fea23262283c84b1d8111802615bee7d502cb"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample08-import-images.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "b515f6b439d123f3991a0f4699eb319865a9d303",
+                     "size":  4312,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/b515f6b439d123f3991a0f4699eb319865a9d303"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample09-import-production-files.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "1a898277e11ba10799721d8f9b0aca6415d824ee",
+                     "size":  4391,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/1a898277e11ba10799721d8f9b0aca6415d824ee"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample10-import-images-in-append-overlay-mode.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "685e1c0750676bcb16ff276b0abf83a2b9ded53c",
+                     "size":  4383,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/685e1c0750676bcb16ff276b0abf83a2b9ded53c"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample11-direct-import-settings-for-images.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "7eb89e33cf04703d98275ae4650ff7052dd727ae",
+                     "size":  4673,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/7eb89e33cf04703d98275ae4650ff7052dd727ae"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample12-import-relativity-dynamic-object.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "2a2207eae1ca7822c8f4e455e791c50ae5929176",
+                     "size":  5780,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/2a2207eae1ca7822c8f4e455e791c50ae5929176"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample13-import-rdo-with-parent.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "a9c6551a52a9d8fc1179853353ec98c3d5a67a22",
+                     "size":  5188,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/a9c6551a52a9d8fc1179853353ec98c3d5a67a22"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample14-direct-import-settings-for-rdo.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "aaeee2fd21679325a9d24c5ac9d63e688615cd05",
+                     "size":  5775,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/aaeee2fd21679325a9d24c5ac9d63e688615cd05"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample15-read-import-rdo-settings.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "d6e3193dfec7644d5a9a3af8f433654583c8ac3b",
+                     "size":  2841,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/d6e3193dfec7644d5a9a3af8f433654583c8ac3b"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample16-read-import-document-settings.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "727a277d567ff6b96583f5c0a6f106bbc0c31043",
+                     "size":  2952,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/727a277d567ff6b96583f5c0a6f106bbc0c31043"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample17-read-import-jobs.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "242c9a901fe21c47885c0068aad76fefc875c1c2",
+                     "size":  3007,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/242c9a901fe21c47885c0068aad76fefc875c1c2"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample18-get-data-source.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "65ce3096f757320074863ffc5ef79f8e0f259728",
+                     "size":  4552,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/65ce3096f757320074863ffc5ef79f8e0f259728"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample19-get-import-job-details-and-progress.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "4625cf35017c3b652c7e6441790ec1debf825db2",
+                     "size":  5948,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/4625cf35017c3b652c7e6441790ec1debf825db2"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample20-get-data-source-details-and-progress.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "b48833022fc40f5e96729aa81565e5e34b1b66bf",
+                     "size":  5673,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/b48833022fc40f5e96729aa81565e5e34b1b66bf"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample21-cancel-started-job.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "cfec1df45b50aa61319b7678a8fa6cd90178832f",
+                     "size":  4730,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/cfec1df45b50aa61319b7678a8fa6cd90178832f"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample22-read-response.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "71063184e5c5ea00b9f3009c50c05f0d3d65a980",
+                     "size":  2743,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/71063184e5c5ea00b9f3009c50c05f0d3d65a980"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/SamplesCollection/sample23-get-data-source-errors.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "a2f4829331d8b777bcd05f4e0e37e1697a1362f7",
+                     "size":  7178,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/a2f4829331d8b777bcd05f4e0e37e1697a1362f7"
+                 },
+                 {
+                     "path":  "Samples/RestSamples/run-sample-import.ps1",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "e30b705de44db99b03d5af9c43243187a00dc5a0",
+                     "size":  2501,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/e30b705de44db99b03d5af9c43243187a00dc5a0"
+                 },
+                 {
+                     "path":  "Samples/Samples.sln",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "211c2456c45973dd147b267a843719ebeade41a5",
+                     "size":  3475,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/211c2456c45973dd147b267a843719ebeade41a5"
+                 },
+                 {
+                     "path":  "Samples/ignoreStylecop.ruleset",
+                     "mode":  "100644",
+                     "type":  "blob",
+                     "sha":  "916277252b324c9db4f878f5bdf6314977f718c8",
+                     "size":  7694,
+                     "url":  "https://api.github.com/repos/relativitydev/relativity-import-samples/git/blobs/916277252b324c9db4f878f5bdf6314977f718c8"
+                 }
+             ],
+    "truncated":  false
+}

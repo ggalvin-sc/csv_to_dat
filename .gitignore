@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# Google Drive sync artifacts
+desktop.ini
+
+# Real case production outputs — keep out of version control
+# (test fixtures under tests/fixtures/ are tracked intentionally)
+/VOL001.dat
+/VOL001.dct
+/VOL001.opt
+/VOL001.csv
+/VOL001_roundtrip.csv

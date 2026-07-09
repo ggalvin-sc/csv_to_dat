@@ -1,0 +1,25 @@
+# csv_to_dat header sidecar (NOT a Concordance CPL dictionary)
+# One field name per line; blank lines and # comments are ignored on read.
+Control Number
+Custodian
+Date Created
+Date Last Modified
+Date Received
+Date Sent
+Document Extension
+Email BCC
+Email CC
+Email From
+Email Subject
+Email To
+Extracted Text
+Filename
+Filesize
+Folder Path
+Group Identifier
+MD5 Hash
+number of attachments
+Parent Document ID
+Subject
+Title
+FILE_PATH
