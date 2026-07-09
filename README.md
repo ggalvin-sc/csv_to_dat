@@ -1,180 +1,177 @@
 # csv_to_dat
 
 A robust, dependency-free Python 3 converter between **CSV** and **Concordance
-DAT** (the de-facto document-level load file format used in legal eDiscovery).
-Supports both directions and round-trip verification, with configurable
-delimiters, quote characters, in-field newline handling, multi-value
-separators, and text encoding.
+DAT** — the de-facto document-level load file format used in legal eDiscovery
+(Concordance, Relativity, Logikcull, Nuix, and friends).
 
-See [`DAT_FORMAT.md`](DAT_FORMAT.md) for the authoritative format reference.
+Converts in both directions, verifies round-trips field-by-field, validates
+Bates/family semantics, merges thin CSVs onto full production schemas, and can
+emit a minimal Opticon `.opt` companion. Standard library only — no
+`pip install` required (Python 3.8+).
+
+See [`DAT_FORMAT.md`](DAT_FORMAT.md) for the full format reference, including
+control-character encoding, BOM handling, and known format ambiguities.
+
+## Why this exists
+
+Concordance DAT files are CSV-like but use non-printing control characters
+instead of commas and double quotes:
+
+| Role | Byte | Character |
+|---|---|---|
+| Field delimiter | `0x14` | DC4 (looks like `¶` in some viewers) |
+| Text qualifier ("quote") | `0xFE` | `þ` thorn |
+| In-field newline | `0xAE` | `®` registered sign |
+| Multi-value separator | `0x3B` | `;` (Relativity default) |
+
+Generic CSV tooling mangles these files. This tool reads and writes them
+natively, with the classic **cp1252** encoding by default (single-byte thorn —
+UTF-8 would write `C3 BE` and break older loaders).
 
 ## Features
 
-* **csv2dat** -- CSV to Concordance DAT, with an optional header-sidecar `.dct`
-  field-name list (not a Concordance CPL dictionary).
-* **dat2csv** -- DAT back to CSV, using a `.dct`, explicit field names, or
+- **`csv2dat`** — CSV to Concordance DAT, with an optional header-sidecar
+  `.dct` field-name list.
+- **`dat2csv`** — DAT back to CSV, using a `.dct`, explicit field names, or
   inferred `FIELD1..FIELDn` headers.
-* **roundtrip** -- verify CSV -> DAT -> CSV (or DAT -> CSV -> DAT) field-by-field
-  and report any differences.
-* **validate** -- semantic load checks: BEGDOC uniqueness, ENDDOC order,
-  optional native-file existence.
-* **opt** -- minimal Opticon `.opt` companion (one image line per document by
+- **`roundtrip`** — verify CSV → DAT → CSV (or DAT → CSV → DAT) field-by-field
+  and report differences. Exit code 0 on PASS, 1 on FAIL.
+- **`validate`** — semantic load checks: BEGDOC uniqueness, numeric-aware
+  ENDDOC ordering (`PREFIX_9 < PREFIX_10`), overlapping Bates-range detection,
+  BEGATTACH family integrity, optional native-file existence.
+- **`opt`** — minimal Opticon `.opt` companion (one image line per document by
   default; paths derived from Bates + `--image-dir`).
-* Classic Concordance defaults: delim `0x14`, quote `0xFE`, in-field newline
-  `0xAE`, multi-value `;` (`0x3B`), encoding **`cp1252`** (single-byte thorn).
-* Fixed field-count enforcement (pad short rows; reject or truncate overlong).
-* Legacy `0x1E` multi-value separators inside values are rewritten to `;` on write.
-* Every field wrapped in the quote char; empty fields become two consecutive
-  quote chars; embedded quote chars are doubled; embedded newlines are encoded
-  as `0xAE`.
-* Streaming I/O -- rows are converted one at a time; multi-hundred-MB files do
-  not need to be fully resident in memory.
-* Standard library only -- no `pip install` required (Python 3.8+).
-* Optional `pip install -e .` registers the `csv-to-dat` console script.
+- **Schema merge** (`--merge-schema`) — project a thin CSV onto a fuller
+  production schema by field name, keeping every target field (blank when
+  missing). Conservative alias handling, dropped-column and collision warnings,
+  and a `--strict-merge` fail-fast mode.
+- **Correct BOM handling** — reads UTF-8-BOM DATs transparently; UTF-16 writes
+  emit exactly one BOM at the start of the file; cp1252 output is BOM-free.
+- **Streaming I/O** — rows are converted one at a time; multi-hundred-MB files
+  never need to be fully resident in memory.
+- Fixed field-count enforcement: pad short rows; reject or truncate overlong
+  rows (`--field-count-mode`).
+- Legacy `0x1E` multi-value separators inside values are rewritten to `;` on
+  write (disable with `--no-normalize-multivalue`).
+- Every field is wrapped in the quote char; empty fields become `þþ`; embedded
+  quote chars are doubled; embedded newlines are encoded as `0xAE` and restored
+  to `\n` on read.
 
 ## Install
 
-No dependencies. Just clone / copy the `csv_to_dat` package folder. Optional
-test dependency: `pytest`.
-
-```
-# requirements.txt is empty of runtime deps; tests use pytest (optional)
-```
-
-## Usage (PowerShell)
-
-**If your workspace root is this `csv_to_dat` folder** (typical in Cursor), use
-`python .\\run.py` or `python .\\cli.py` — `python -m csv_to_dat` only works when
-run from the **parent** directory:
-
 ```powershell
-# From inside csv_to_dat\ (Cursor workspace root)
-python .\run.py csv2dat `
-  ".\tests\fixtures\VOL001_slice.csv" `
-  ".\VOL001.dat" `
-  --field-names BEGDOC,ENDDOC,CODED,FILEPATH
+git clone https://github.com/ggalvin-sc/csv_to_dat.git
+cd csv_to_dat
 
-# From the parent of csv_to_dat\ (package on sys.path)
-python -m csv_to_dat csv2dat `
-  ".\csv_to_dat\tests\fixtures\VOL001_slice.csv" `
-  ".\csv_to_dat\VOL001.dat"
+# Nothing to install — run directly:
+python .\run.py --help
+
+# Optional: register the `csv-to-dat` console script
+pip install -e .
+csv-to-dat --help
 ```
+
+Runtime dependencies: **none** (standard library only). Tests optionally use
+`pytest`.
+
+## Quick start (PowerShell)
 
 ```powershell
 # CSV -> DAT (classic Concordance defaults: cp1252 + 0x14/0xFE/0xAE)
-python .\run.py csv2dat `
-  "G:\My Drive\GLG - Google Drive\Casedoxx\Code\csv_to_dat\samples\VOL001.csv" `
-  ".\VOL001.dat"
+python .\run.py csv2dat .\load.csv .\VOL001.dat
 
-# Override field names to standard Concordance names
-python .\run.py csv2dat `
-  ".\VOL001.csv" `
-  ".\VOL001.dat" `
+# Rename columns to standard Concordance names (positional)
+python .\run.py csv2dat .\load.csv .\VOL001.dat `
   --field-names BEGDOC,ENDDOC,CODED,FILEPATH
 
-# Field names from a file (one per line; use when a name contains a comma)
-python .\run.py csv2dat ".\VOL001.csv" ".\VOL001.dat" `
-  --field-names-file ".\fields.txt"
+# Project a thin CSV onto a full production schema (name-based merge)
+python .\run.py csv2dat .\load.csv .\VOL001_full.dat `
+  --field-names-file .\schemas\standard_native.txt `
+  --merge-schema
 
 # DAT -> CSV (headers auto-read from the companion .dct)
-python .\run.py dat2csv ".\VOL001.dat" ".\VOL001_roundtrip.csv"
+python .\run.py dat2csv .\VOL001.dat .\VOL001.csv
 
-# Modern UTF-8 DAT (only when the receiving platform expects UTF-8)
-python .\run.py csv2dat ".\VOL001.csv" ".\VOL001_utf8.dat" `
-  --encoding utf-8
+# Verify a lossless round-trip (exit 0 = PASS)
+python .\run.py roundtrip --direction csv2dat .\load.csv
+python .\run.py roundtrip --direction dat2csv .\VOL001.dat
 
-# Accept data loss for characters that cannot encode into cp1252
-python .\run.py csv2dat ".\VOL001.csv" ".\VOL001.dat" `
-  --encoding-errors replace
+# Validate Bates uniqueness, ENDDOC order, ranges, and families
+python .\run.py validate .\VOL001.dat --field-names BEGDOC,ENDDOC,CODED,FILEPATH
 
-# Verify CSV -> DAT -> CSV (prints PASS/FAIL + diff counts)
-python .\run.py roundtrip --direction csv2dat ".\VOL001.csv"
+# Optionally require natives to exist on disk
+python .\run.py validate .\load.csv --field-names BEGDOC,ENDDOC,CODED,FILEPATH `
+  --check-natives --natives-root .\NATIVES
 
-# Verify DAT -> CSV -> DAT
-python .\run.py roundtrip --direction dat2csv ".\VOL001.dat"
-
-# Validate Bates uniqueness / ENDDOC order
-python .\run.py validate ".\VOL001.dat" --field-names BEGDOC,ENDDOC,CODED,FILEPATH
-
-# Optional: require natives to exist on disk
-python .\run.py validate ".\VOL001.csv" --field-names BEGDOC,ENDDOC,CODED,FILEPATH `
-  --check-natives --natives-root ".\NATIVES"
-
-# Write a minimal Opticon .opt companion (1 page/doc placeholders)
-python .\run.py opt ".\VOL001.dat" ".\VOL001.opt" `
-  --volume VOL001 --image-dir "IMAGES\001"
+# Write a minimal Opticon .opt companion
+python .\run.py opt .\VOL001.dat .\VOL001.opt --volume VOL001 --image-dir "IMAGES\001"
 ```
 
-### Subcommand reference
+`python -m csv_to_dat …` also works when the package folder's **parent** is on
+`sys.path` (i.e., run it from the directory that contains `csv_to_dat\`).
+
+## Subcommand reference
 
 | Subcommand | Args | Notes |
 |---|---|---|
-| `csv2dat` | `input` `output` | Writes `output` and a header-sidecar `.dct` (unless `--no-dct`). |
-| `dat2csv` | `input` `output` | Headers from `--field-names` / `--field-names-file`, `--dct`, the companion `.dct`, or inferred. |
-| `roundtrip` | `input` `--direction {csv2dat,dat2csv}` | Returns exit code 0 on PASS, 1 on FAIL. |
-| `validate` | `input` | Bates uniqueness, ENDDOC order, optional native existence. Exit 0/1. |
+| `csv2dat` | `input` `output` | Writes `output` plus a header-sidecar `.dct` (unless `--no-dct`). |
+| `dat2csv` | `input` `output` | Headers from `--field-names` / `--field-names-file`, `--dct PATH`, the companion `.dct`, or inferred. |
+| `roundtrip` | `input` `--direction {csv2dat,dat2csv}` | Field-by-field verification; exit 0/1. Accepts `--csv-encoding` for non-UTF-8 sources. |
+| `validate` | `input` | Bates uniqueness, ENDDOC order, range overlap, family integrity, optional native existence. Exit 0/1. |
 | `opt` | `input.dat` `output.opt` | Minimal Opticon companion from BEGDOC values. |
 
 ### Common options (all subcommands)
 
 | Option | Default | Meaning |
 |---|---|---|
-| `--delim` | `0x14` | Field delimiter (char or ASCII/Unicode code, e.g. `20`, `0x14`, `,`). |
+| `--delim` | `0x14` | Field delimiter (char or code: `20`, `0x14`, `,`). |
 | `--quote` | `0xFE` | Quote / text qualifier. |
 | `--newline` | `0xAE` | In-field newline representation. |
-| `--multival` | `0x3B` (`;`) | Multi-value separator (Relativity default). Legacy `0x1E` inside values is rewritten to this on write. |
-| `--encoding` | `cp1252` | Text encoding for the DAT. Use `utf-8` only when the receiver expects it. |
+| `--multival` | `0x3B` (`;`) | Multi-value separator (Relativity default). |
+| `--encoding` | `cp1252` | DAT text encoding. Use `utf-8` only when the receiver expects it. |
 | `--encoding-errors` | `strict` | `strict` / `replace` / `ignore` / `xmlcharrefreplace`. |
 | `--field-count-mode` | `pad_reject` | `pad_reject` (pad short, reject overlong), `pad_truncate`, or `reject`. |
 | `--no-normalize-multivalue` | off | Keep legacy `0x1E` separators inside values as-is. |
 | `--crlf` | off | Use CRLF as the record terminator. |
 
-`csv2dat` also accepts `--field-names`, `--field-names-file`, `--no-dct`,
-`--csv-encoding` (default utf-8 for the source CSV), `--csv-delim`.
-`dat2csv` also accepts `--field-names`, `--field-names-file`, and `--dct PATH`.
+`csv2dat` also accepts `--field-names`, `--field-names-file`, `--merge-schema`,
+`--strict-merge`, `--no-dct`, `--csv-encoding` (source CSV, default utf-8), and
+`--csv-delim`. All four control characters are validated to be pairwise
+distinct before any file is written.
 
-## Field-name mapping for the sample volume index
+## Schema merge
 
-The sample `VOL001.csv` header is:
-
-```
-Bates/Control #,End Bates/Control #,Coded,Filename
-```
-
-A sensible mapping to standard Concordance names (pass via `--field-names`):
-
-```
-Bates/Control #      -> BEGDOC
-End Bates/Control #  -> ENDDOC
-Coded                -> CODED
-Filename             -> FILEPATH
-```
-
-The converter stays generic, though: any CSV header works, and the original
-header names are written to the `.dct` when `--field-names` is omitted.
 `--field-names` is a **positional rename** when the name count matches the CSV
-column count. To project a thin CSV onto a fuller production schema (keeping
-every target field, blank when missing), use `--merge-schema`:
+column count. To project a thin CSV onto a fuller production schema by *name*
+(keeping every target field, blank when missing), add `--merge-schema`:
 
 ```powershell
-python .\run.py csv2dat .\VOL001.csv .\VOL001_full.dat `
+python .\run.py csv2dat .\thin.csv .\full.dat `
   --field-names-file .\schemas\standard_native.txt `
   --merge-schema
 ```
 
-Missing columns (CUSTODIAN, BEGATTACH, MD5, …) are written as empty Concordance
-fields (`þþ`). Unmapped CSV columns and alias collisions are **warned on stderr**;
-add `--strict-merge` to fail instead of dropping metadata silently.
+- Source columns are matched to target fields case-insensitively, with a
+  conservative alias map (e.g. `Bates/Control #` → `BEGDOC`, `Custodian Name`
+  → `CUSTODIAN`). Distinct concepts such as `DOCID` vs `BEGDOC` or `Author`
+  vs `FROM` are deliberately **not** merged.
+- Missing target fields (CUSTODIAN, BEGATTACH, MD5, …) are written as empty
+  Concordance fields (`þþ`).
+- Unmapped source columns and alias collisions are **warned on stderr**. Add
+  `--strict-merge` to fail instead of dropping metadata silently.
+- `--field-count-mode` is honored on the source rows before projection.
 
-## Inspecting a DAT (see the control characters)
+A ready-to-use full schema ships in
+[`schemas/standard_native.txt`](schemas/standard_native.txt).
 
-Because the control characters are non-printing, open the file in a hex viewer,
-or use PowerShell to render an escaped view of the first record:
+## Inspecting a DAT
+
+The control characters are non-printing, so use a hex viewer — or render an
+escaped view of the first record in PowerShell:
 
 ```powershell
 $bytes = [System.IO.File]::ReadAllBytes(".\VOL001.dat")
-$first = $bytes[0..200]
-($first | ForEach-Object {
+($bytes[0..200] | ForEach-Object {
   switch ($_) {
     0x14 { '[DELIM]' }
     0xFE { '[THORN]' }
@@ -186,7 +183,7 @@ $first = $bytes[0..200]
 }) -join ''
 ```
 
-A classic cp1252 DAT should start with byte `FE` (not UTF-8 `C3 BE`).
+A classic cp1252 DAT starts with byte `FE` (not UTF-8 `C3 BE`).
 
 ## Tests
 
@@ -198,59 +195,54 @@ python tests\test_roundtrip.py
 powershell -File .\scripts\ci_test.ps1
 ```
 
-Optional install (registers `csv-to-dat` on PATH):
-
-```powershell
-pip install -e .
-csv-to-dat --help
-```
-
-The test suite copies a small slice of the real sample into
-`tests/fixtures/VOL001_slice.csv` so the tests are self-contained and do not
-depend on the live case path.
+The suite covers round-trip fidelity, encodings and BOM behavior, schema-merge
+aliasing/collision/strict modes, field-count enforcement, header-detection
+heuristics, Bates/family validation, and hardening edge cases. Fixtures under
+`tests/fixtures/external/` exercise real-world Relativity-style DAT and
+Opticon samples.
 
 ## Project layout
 
 ```
 csv_to_dat/
-  __init__.py        # package exports
-  __main__.py        # `python -m csv_to_dat` entry point
-  cli.py             # argparse CLI: csv2dat / dat2csv / roundtrip
-  converter.py       # core read/write/round-trip library (stdlib only)
-  DAT_FORMAT.md      # Concordance DAT format reference
-  README.md          # this file
-  requirements.txt   # runtime: none (stdlib only); tests: pytest
+  __init__.py           # package exports
+  __main__.py           # `python -m csv_to_dat` entry point
+  run.py                # direct entry point when the repo is your cwd
+  cli.py                # argparse CLI: csv2dat / dat2csv / roundtrip / validate / opt
+  converter.py          # core read/write/validate/merge library (stdlib only)
+  DAT_FORMAT.md         # Concordance DAT format reference
+  pyproject.toml        # optional editable install (`csv-to-dat` script)
+  schemas/
+    standard_native.txt # full native-production schema for --merge-schema
+  scripts/
+    ci_test.ps1         # local CI smoke test (PowerShell)
   tests/
     test_roundtrip.py
-    fixtures/
-      VOL001_slice.csv
+    fixtures/           # CSV slice, classic DAT fixtures, external samples
+  .github/workflows/
+    ci.yml              # GitHub Actions: unit tests + CLI smoke
 ```
 
 ## Caveats / assumptions
 
-* **Encoding defaults to cp1252.** Classic Concordance / many Relativity loads
-  expect a single-byte thorn (`FE`). UTF-8 writes `C3 BE` and will break those
-  loaders. Pass `--encoding utf-8` only when you know the receiver wants it.
-* **DAT header row is on by default.** The first line of the `.dat` is
-  Concordance/Relativity field names (thorn-wrapped). Use `--no-header` only
-  for legacy no-header DATs.
-* **`.dct` is a header sidecar**, not a full Concordance CPL data dictionary
-  (no field types/widths). Relativity maps fields in the import UI.
-* **Fixed field count.** Short rows are padded; overlong rows are rejected by
-  default (`--field-count-mode pad_truncate` to drop extras).
-* **Multi-value:** Relativity default is `;`. Legacy `0x1E` inside values is
-  rewritten to `;` on write unless `--no-normalize-multivalue`.
-* The sample's `Coded` column is empty; it is preserved as an empty field
-  (two consecutive quote chars in the DAT).
-* Embedded newlines inside a field are encoded as `0xAE` on write and restored
-  to `\n` on read.
-* Records end with the **trailing delimiter + newline** convention. The parser
-  also tolerates the no-trailing-delimiter variant.
-* This tool can emit a **minimal Opticon `.opt`** (one line per document by
-  default). It does **not** invent multi-page TIFF breakouts from natives, and
-  it does not write LFP. Use `--pages-per-doc` only for intentional placeholders.
-* **`validate`** also checks numeric ENDDOC ordering (PREFIX_9 < PREFIX_10),
-  overlapping Bates ranges between documents, and BEGATTACH family integrity
-  (every BEGATTACH must match a BEGDOC in the same load).
-* `--field-names` is positional; run **`validate`** to check Bates uniqueness
-  and ENDDOC order after mapping.
+- **Encoding defaults to cp1252.** Classic Concordance and many Relativity
+  loads expect a single-byte thorn (`FE`). Pass `--encoding utf-8` only when
+  you know the receiver wants it; UTF-8-BOM DATs are read transparently.
+- **DAT header row is on by default.** The first line is a
+  Concordance/Relativity field-name row (thorn-wrapped). Use `--no-header`
+  only for legacy no-header DATs. Header auto-detection on foreign DATs uses a
+  heuristic — spot-check the first record of unfamiliar files.
+- **`.dct` is a header sidecar**, not a Concordance CPL data dictionary (no
+  field types/widths). Relativity maps fields in its import UI regardless.
+- **Fixed field count.** Short rows are padded; overlong rows are rejected by
+  default (`--field-count-mode pad_truncate` to drop extras instead).
+- The Opticon writer is **minimal**: one line per document by default. It does
+  not invent multi-page TIFF breakouts from natives and does not write LFP.
+  Use `--pages-per-doc` only for intentional placeholders.
+- The `®` (`0xAE`) byte is overloaded by the format itself: it means "newline"
+  inside a field, so a literal registered-trademark character in data is
+  indistinguishable from a line break. See `DAT_FORMAT.md` for details.
+
+## License
+
+No license file yet — all rights reserved unless one is added.
