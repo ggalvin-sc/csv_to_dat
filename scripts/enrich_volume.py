@@ -1292,14 +1292,16 @@ def run_csv_to_dat(
         for ln in schema_file.read_text(encoding="utf-8").splitlines()
         if ln.strip() and not ln.strip().startswith("#")
     ]
-    # Classic Concordance: field names live in the .dct only — no DAT header row.
+    # Classic Concordance with DATA-layout / self-contained packages: emit a
+    # thorn-wrapped field-name header as the first DAT record (Relativity-
+    # friendly). Field names are also written to the companion .dct.
     csv_to_dat(
         str(enriched_csv),
         str(dat_out),
         DatConfig(),
         field_names=field_names,
         emit_dct=True,
-        emit_header=False,
+        emit_header=True,
         csv_encoding="utf-8",
         merge_schema=True,
         strict_merge=True,
