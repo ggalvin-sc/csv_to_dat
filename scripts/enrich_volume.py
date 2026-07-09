@@ -1247,8 +1247,9 @@ def write_build_report(
     lines.append("| Incident 4.26.24 pt 2 | Same folder as pt 1 — children attached only to pt 1 to avoid duplicates |")
     lines.append("| 12.5.24 placeholders | No media folders present — parents only, blank TEXTPATH |")
     lines.append(
-        "| Family integrity | Parent + children share BEGATTACH=parent and "
-        "ENDATTACH=last child Bates |"
+        "| Family integrity | Parent + children share BEGATTACH=ENDATTACH=parent "
+        "(parent-only; children Bates are non-contiguous so last-child ENDATTACH "
+        "would falsely span unrelated docs) |"
     )
     lines.append("| Case data on GitHub | Output stays under case/local build folder; not committed to csv_to_dat |")
     lines.append("")
@@ -1578,9 +1579,14 @@ def build_volume(args: argparse.Namespace) -> int:
 
             media_files = list_media_files(folder)
             expanded_folders[folder_name] = parent
-            # Collect child Bates first so every family member (parent + children)
-            # can share BEGATTACH=parent and ENDATTACH=last child.
-            family_child_bates: List[str] = []
+            # Family attach fields: BEGATTACH=ENDATTACH=parent on every member.
+            #
+            # Why not ENDATTACH=last child (classic contiguous Concordance range)?
+            # Media children are Bates-appended after the original volume
+            # (e.g. parent 000001, children 001360–001363). A last-child
+            # ENDATTACH would imply a false contiguous family spanning every
+            # unrelated Bates between parent and last child. Parent-only
+            # attach fields identify the family without that false range.
             pending_children: List[Tuple[str, Path, str, str, str]] = []
             # (child_bates, media, ext, filepath, rel_src)
             for media in media_files:
@@ -1594,15 +1600,13 @@ def build_volume(args: argparse.Namespace) -> int:
                     media_placements.append((child_bates, media, ext))
                 else:
                     filepath = rel_between(output, media)
-                family_child_bates.append(child_bates)
                 pending_children.append((child_bates, media, ext, filepath, rel_src))
 
-            end_attach = family_child_bates[-1] if family_child_bates else parent
-            # Stamp family range on the parent row (already in enriched).
+            # Stamp family id on the parent row (already in enriched).
             for row in enriched:
                 if row["BEGDOC"] == parent:
                     row["BEGATTACH"] = parent
-                    row["ENDATTACH"] = end_attach
+                    row["ENDATTACH"] = parent
                     break
 
             for child_bates, media, ext, filepath, rel_src in pending_children:
@@ -1635,7 +1639,7 @@ def build_volume(args: argparse.Namespace) -> int:
                         "BEGDOC": child_bates,
                         "ENDDOC": child_bates,
                         "BEGATTACH": parent,
-                        "ENDATTACH": end_attach,
+                        "ENDATTACH": parent,
                         "CUSTODIAN": "",
                         "CODED": "",
                         "FILEPATH": filepath,
