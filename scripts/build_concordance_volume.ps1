@@ -22,6 +22,13 @@ param(
     [ValidateSet("classic", "relative")]
     [string]$Layout = "classic",
 
+    [ValidateSet("auto", "copy", "hardlink", "symlink")]
+    [string]$CopyMode = "auto",
+
+    [string]$DataDir = "",
+
+    [switch]$SelfContained,
+
     [switch]$DryRun
 )
 
@@ -39,6 +46,15 @@ if (-not (Test-Path -LiteralPath $py)) {
 $argsList = @($py, "--source", $Source, "--repo", $Repo, "--layout", $Layout)
 if ($Output) {
     $argsList += @("--output", $Output)
+}
+if ($SelfContained) {
+    $argsList += "--self-contained"
+}
+elseif ($CopyMode -ne "auto") {
+    $argsList += @("--copy-mode", $CopyMode)
+}
+if ($DataDir) {
+    $argsList += @("--data-dir", $DataDir)
 }
 if ($DryRun) {
     $argsList += "--dry-run"
