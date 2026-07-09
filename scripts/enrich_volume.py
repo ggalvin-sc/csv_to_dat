@@ -9,7 +9,9 @@ no TEXTPATH) and builds a sibling VOL001_LOAD package with:
 
   * Bates-relative FILEPATH into NATIVES\\0001\\
   * Expanded child Bates for media under Items with Placeholders
-  * TEXT\\0001\\{BEGDOC}.txt companions from existing STT .txt sidecars
+  * TEXT\\0001\\{BEGDOC}.txt companions from:
+      - PDF natives: extracted text (pypdf / pdfminer) with page/paragraph breaks
+      - Media children: STT sidecars (prefer JSON utterances, else SRT, else .txt)
   * Classic Concordance DAT/DCT + corrected OPT (IMAGES\\0001\\*.pdf)
   * build_report.md (coverage, Bates map, countervoice notes)
 
@@ -23,7 +25,15 @@ FUNCTIONS
   load_csv_rows()           Read thin volume CSV (Bates/Filename columns).
   placeholder_folder_map()  Explicit PLACEHOLDER filename -> media folder.
   list_media_files()        Recurse for mp4/mp3/wav/m4a under a folder.
-  sidecar_txt()             Same-basename .txt beside a media file.
+  sidecar_transcript()      Prefer .json / .srt / .txt beside a media file.
+  format_hms()              Seconds -> HH:MM:SS for TEXT line prefixes.
+  json_to_formatted_text()  Deepgram JSON -> timed utterance lines.
+  srt_to_formatted_text()   SRT -> timed dialogue lines (keep markers).
+  extract_pdf_text()        Extract readable text from a PDF native/image.
+  write_text_bytes()        Normalize + write UTF-8/CRLF TEXT companion bytes.
+  write_text_companion()    STT sidecar -> TEXT companion.
+  write_pdf_text_companion() PDF path -> TEXT companion.
+  rebuild_text_from_enriched()  Re-write TEXT\\0001 + TEXTPATH from enriched CSV.
   copy_or_link()            Hardlink when possible, else copy2 with retries.
   ensure_dir()              mkdir -p helper.
   build_volume()            Main pipeline: inventory -> expand -> TEXT -> DAT.
@@ -35,6 +45,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import os
 import re
 import shutil
@@ -43,13 +54,14 @@ import traceback
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 # ---------------------------------------------------------------------------
 # Media / STT constants
 # ---------------------------------------------------------------------------
 
 MEDIA_EXTS = {".mp4", ".mp3", ".wav", ".m4a", ".avi", ".mov", ".mkv", ".wmv"}
+PDF_EXTS = {".pdf"}
 SCHEMA_FIELDS = [
     "BEGDOC",
     "ENDDOC",
@@ -91,6 +103,8 @@ class BuildStats:
     placeholders_unmapped: List[str] = field(default_factory=list)
     media_children: int = 0
     text_written: int = 0
+    text_pdf_written: int = 0
+    text_pdf_empty: List[str] = field(default_factory=list)
     text_missing_media: List[str] = field(default_factory=list)
     copy_failures: List[str] = field(default_factory=list)
     new_bates_start: int = 0
@@ -155,6 +169,18 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         default="classic",
         help="classic=NATIVES\\0001\\{BEGDOC}ext under the DAT folder (default); "
         "relative=..\\ paths into the source volume",
+    )
+    p.add_argument(
+        "--rebuild-text",
+        action="store_true",
+        help="Regenerate TEXT\\0001 companions (PDF extract + STT) from an "
+        "existing VOL001_enriched.csv, update TEXTPATH, and rebuild DAT. "
+        "Use --output for the LOAD package; --source for Items with Placeholders.",
+    )
+    p.add_argument(
+        "--skip-pdf-text",
+        action="store_true",
+        help="Do not extract text from PDF natives into TEXT companions",
     )
     return p.parse_args(argv)
 
@@ -258,17 +284,31 @@ def list_media_files(folder: Path) -> List[Path]:
     return found
 
 
+def _nonempty_file(path: Path) -> bool:
+    """True when path exists as a non-empty file."""
+    try:
+        return path.is_file() and path.stat().st_size > 0
+    except OSError:
+        return False
+
+
 def sidecar_transcript(media: Path) -> Optional[Path]:
-    """Return preferred STT sidecar: non-empty .txt, else .srt (never .json)."""
-    txt = media.with_suffix(".txt")
-    if txt.is_file() and txt.stat().st_size > 0:
-        return txt
+    """
+    Return preferred STT sidecar for Concordance TEXT.
+
+    Preference: .json (utterances/paragraphs with timing) > .srt (cues) > .txt
+    (plain wall-of-text transcript). Deepgram exports often ship all three;
+    the .txt is usually an unformatted dump of the same words.
+    """
+    js = media.with_suffix(".json")
     srt = media.with_suffix(".srt")
-    if srt.is_file() and srt.stat().st_size > 0:
+    txt = media.with_suffix(".txt")
+    if _nonempty_file(js):
+        return js
+    if _nonempty_file(srt):
         return srt
-    # Empty .txt with usable .srt — prefer SRT.
-    if txt.is_file() and srt.is_file() and srt.stat().st_size > 0:
-        return srt
+    if _nonempty_file(txt):
+        return txt
     return None
 
 
@@ -473,11 +513,62 @@ def doctype_for(filename: str, is_child: bool, media_ext: str = "") -> str:
 
 
 _SRT_TS_RE = re.compile(
-    r"^\d{1,2}:\d{2}:\d{2}[,\.]\d{1,3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,\.]\d{1,3}"
+    r"^(\d{1,2}:\d{2}:\d{2})[,\.]\d{1,3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,\.]\d{1,3}"
 )
 _SRT_INDEX_RE = re.compile(r"^\d+$")
 # Concordance DAT control characters must never appear in extracted-text bodies.
 _DAT_CTRL_RE = re.compile("[\x14\xfe\xae]")
+
+
+def format_hms(seconds: Union[int, float]) -> str:
+    """Format a duration in seconds as HH:MM:SS (floor, no millis)."""
+    total = max(0, int(float(seconds)))
+    hours, rem = divmod(total, 3600)
+    minutes, secs = divmod(rem, 60)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+
+def srt_to_formatted_text(text: str) -> str:
+    """
+    Convert SRT cues to readable timed lines.
+
+    Example: ``[00:00:04] To report sexual assault or harassment, press 0.``
+    Sequence numbers are dropped; cue start time is kept as ``[HH:MM:SS]``.
+    """
+    lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    out: List[str] = []
+    current_ts: Optional[str] = None
+    dialogue: List[str] = []
+
+    def flush() -> None:
+        nonlocal current_ts, dialogue
+        body = " ".join(p for p in dialogue if p).strip()
+        if body and current_ts is not None:
+            out.append(f"[{current_ts}] {body}")
+        elif body:
+            out.append(body)
+        current_ts = None
+        dialogue = []
+
+    for line in lines:
+        s = line.strip()
+        if not s:
+            flush()
+            continue
+        if _SRT_INDEX_RE.match(s):
+            continue
+        m = _SRT_TS_RE.match(s)
+        if m:
+            flush()
+            current_ts = m.group(1)
+            # Normalize single-digit hours to HH:MM:SS
+            parts = current_ts.split(":")
+            if len(parts) == 3:
+                current_ts = f"{int(parts[0]):02d}:{parts[1]}:{parts[2]}"
+            continue
+        dialogue.append(s)
+    flush()
+    return "\n".join(out)
 
 
 def srt_to_plain_text(text: str) -> str:
@@ -495,21 +586,77 @@ def srt_to_plain_text(text: str) -> str:
     return "\n".join(out)
 
 
-def normalize_extracted_text(text: str, *, from_srt: bool = False) -> str:
+def json_to_formatted_text(data: Dict[str, Any]) -> str:
     """
-    Normalize transcript text for Concordance/Relativity TEXTPATH companions.
+    Build timed transcript lines from a Deepgram-style STT JSON payload.
+
+    Preference order:
+      1. results.utterances — one line per utterance, optional Speaker N
+      2. results.channels[0].alternatives[0].paragraphs.paragraphs — sentences
+      3. results.channels[0].alternatives[0].transcript — plain fallback
+    """
+    results = data.get("results") or {}
+    utterances = results.get("utterances")
+    if isinstance(utterances, list) and utterances:
+        lines: List[str] = []
+        for u in utterances:
+            if not isinstance(u, dict):
+                continue
+            body = str(u.get("transcript") or "").strip()
+            if not body:
+                continue
+            ts = format_hms(u.get("start") or 0)
+            speaker = u.get("speaker")
+            if speaker is not None and str(speaker).strip() != "":
+                lines.append(f"[{ts}] Speaker {speaker}: {body}")
+            else:
+                lines.append(f"[{ts}] {body}")
+        if lines:
+            return "\n".join(lines)
+
+    channels = results.get("channels") or []
+    if channels and isinstance(channels[0], dict):
+        alts = channels[0].get("alternatives") or []
+        if alts and isinstance(alts[0], dict):
+            alt = alts[0]
+            paras_wrap = alt.get("paragraphs")
+            if isinstance(paras_wrap, dict):
+                paras = paras_wrap.get("paragraphs") or []
+                lines = []
+                for para in paras:
+                    if not isinstance(para, dict):
+                        continue
+                    for sent in para.get("sentences") or []:
+                        if not isinstance(sent, dict):
+                            continue
+                        body = str(sent.get("text") or "").strip()
+                        if not body:
+                            continue
+                        lines.append(f"[{format_hms(sent.get('start') or 0)}] {body}")
+                if lines:
+                    return "\n".join(lines)
+            transcript = str(alt.get("transcript") or "").strip()
+            if transcript:
+                return transcript
+
+    # Some exporters put transcript at the top level.
+    top = str(data.get("transcript") or "").strip()
+    return top
+
+
+def normalize_extracted_text(text: str) -> str:
+    """
+    Normalize extracted text for Concordance/Relativity TEXTPATH companions.
 
     - UTF-8 body (caller writes without BOM)
     - Windows CRLF newlines
-    - Plain dialogue only (SRT timing stripped when from_srt)
     - Strip Concordance control chars 0x14 / 0xFE / 0xAE
+    - Collapse runs of blank lines (keep single paragraph breaks)
     """
-    if from_srt:
-        text = srt_to_plain_text(text)
-    else:
-        text = text.replace("\r\n", "\n").replace("\r", "\n")
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    # PDF field padding often uses NBSP; normalize for readable Concordance text.
+    text = text.replace("\u00a0", " ").replace("\u2007", " ").replace("\u202f", " ")
     text = _DAT_CTRL_RE.sub("", text)
-    # Collapse excessive blank lines but keep paragraph breaks.
     lines = [ln.rstrip() for ln in text.split("\n")]
     cleaned: List[str] = []
     blank_run = 0
@@ -528,15 +675,150 @@ def normalize_extracted_text(text: str, *, from_srt: bool = False) -> str:
     return text.replace("\n", "\r\n")
 
 
-def write_text_companion(src_txt: Path, dst_txt: Path) -> int:
+def write_text_bytes(body: str, dst_txt: Path) -> int:
     """
-    Write a Concordance extracted-text companion from an STT sidecar.
+    Normalize ``body`` and write UTF-8 (no BOM) CRLF TEXT companion.
 
-    Returns byte length written. Raises ValueError if the result would be empty
-    after normalization (caller should leave TEXTPATH blank).
+    Returns byte length written. Raises ValueError if empty after normalize.
     """
     ensure_dir(dst_txt.parent)
-    raw = src_txt.read_bytes()
+    normalized = normalize_extracted_text(body)
+    if not normalized.strip():
+        raise ValueError("empty text after normalize")
+    data = normalized.encode("utf-8")  # no BOM
+    dst_txt.write_bytes(data)
+    return len(data)
+
+
+def _pdf_page_text_pypdf(pdf_path: Path) -> List[str]:
+    """Extract per-page text via pypdf (optional dependency)."""
+    from pypdf import PdfReader  # type: ignore
+
+    reader = PdfReader(str(pdf_path))
+    pages: List[str] = []
+    for page in reader.pages:
+        pages.append(page.extract_text() or "")
+    return pages
+
+
+def _pdf_page_text_pdfminer(pdf_path: Path) -> List[str]:
+    """Extract per-page text via pdfminer.six (optional dependency)."""
+    from pdfminer.high_level import extract_text  # type: ignore
+
+    # pdfminer returns one string; split on form feed when present.
+    full = extract_text(str(pdf_path)) or ""
+    if "\x0c" in full:
+        return full.split("\x0c")
+    return [full] if full.strip() else []
+
+
+def _pdf_page_text_pymupdf(pdf_path: Path) -> List[str]:
+    """Extract per-page text via PyMuPDF / fitz (optional dependency)."""
+    import fitz  # type: ignore
+
+    doc = fitz.open(str(pdf_path))
+    try:
+        return [doc.load_page(i).get_text("text") or "" for i in range(doc.page_count)]
+    finally:
+        doc.close()
+
+
+def extract_pdf_text(pdf_path: Path) -> str:
+    """
+    Extract readable text from a PDF, preserving page and paragraph breaks.
+
+    Tries pypdf, then pdfminer.six, then PyMuPDF. Pages are separated by a
+    blank line (and a ``--- Page N ---`` marker). Raises ValueError when no
+    extractor is installed or the PDF yields no text (image-only / empty).
+    """
+    if not pdf_path.is_file():
+        raise ValueError(f"PDF not found: {pdf_path}")
+
+    errors: List[str] = []
+    pages: Optional[List[str]] = None
+    for name, fn in (
+        ("pypdf", _pdf_page_text_pypdf),
+        ("pdfminer", _pdf_page_text_pdfminer),
+        ("pymupdf", _pdf_page_text_pymupdf),
+    ):
+        try:
+            pages = fn(pdf_path)
+            break
+        except ImportError:
+            errors.append(f"{name} not installed")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{name}: {exc}")
+
+    if pages is None:
+        raise ValueError(
+            "no PDF text extractor available (install pypdf or pdfminer.six); "
+            + "; ".join(errors)
+        )
+
+    blocks: List[str] = []
+    for i, page_text in enumerate(pages, start=1):
+        body = (page_text or "").replace("\r\n", "\n").replace("\r", "\n")
+        # Soft hyphen / form-feed cleanup; keep real newlines from the extractor.
+        body = body.replace("\x0c", "\n").replace("\u00ad", "")
+        body = body.strip()
+        if not body:
+            continue
+        blocks.append(f"--- Page {i} ---")
+        blocks.append(body)
+        blocks.append("")  # blank line between pages
+
+    text = "\n".join(blocks).strip()
+    if not text:
+        raise ValueError(f"no extractable text in PDF: {pdf_path.name}")
+    return text
+
+
+def resolve_pdf_for_text(
+    beg: str,
+    filepath: str,
+    output: Path,
+    native_index: Optional[Dict[str, Path]] = None,
+    image_index: Optional[Dict[str, Path]] = None,
+) -> Optional[Path]:
+    """
+    Locate the best PDF to extract text from for a Bates ID.
+
+    Preference: native under FILEPATH / native_index, else IMAGES PDF.
+    """
+    candidates: List[Path] = []
+    if filepath:
+        p = output / filepath.replace("\\", os.sep)
+        candidates.append(p)
+    if native_index and beg in native_index:
+        candidates.append(native_index[beg])
+    if image_index and beg in image_index:
+        candidates.append(image_index[beg])
+    # Classic package layout fallbacks.
+    candidates.append(output / "NATIVES" / "0001" / f"{beg}.pdf")
+    candidates.append(output / "IMAGES" / "0001" / f"{beg}.pdf")
+
+    seen: set = set()
+    for c in candidates:
+        try:
+            key = str(c.resolve())
+        except OSError:
+            key = str(c)
+        if key in seen:
+            continue
+        seen.add(key)
+        if c.is_file() and c.suffix.lower() in PDF_EXTS:
+            return c
+    return None
+
+
+def extract_text_from_sidecar(src: Path) -> str:
+    """
+    Read an STT sidecar and return formatted transcript body (LF newlines).
+
+    .json / .srt produce timed lines; .txt is passed through as-is.
+    """
+    suffix = src.suffix.lower()
+    raw = src.read_bytes()
     for enc in ("utf-8-sig", "utf-8", "cp1252", "latin-1"):
         try:
             text = raw.decode(enc)
@@ -546,15 +828,145 @@ def write_text_companion(src_txt: Path, dst_txt: Path) -> int:
     else:
         text = raw.decode("utf-8", errors="replace")
 
-    from_srt = src_txt.suffix.lower() == ".srt"
-    normalized = normalize_extracted_text(text, from_srt=from_srt)
-    if not normalized.strip():
-        raise ValueError(f"empty transcript after normalize: {src_txt}")
+    if suffix == ".json":
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"invalid STT JSON: {src}: {exc}") from exc
+        if not isinstance(data, dict):
+            raise ValueError(f"STT JSON root must be object: {src}")
+        return json_to_formatted_text(data)
 
-    # UTF-8 without BOM (Relativity text-file import default).
-    data = normalized.encode("utf-8")  # no BOM
-    dst_txt.write_bytes(data)
-    return len(data)
+    if suffix == ".srt":
+        return srt_to_formatted_text(text)
+
+    return text
+
+
+def write_text_companion(src_txt: Path, dst_txt: Path) -> int:
+    """
+    Write a Concordance extracted-text companion from an STT sidecar.
+
+    Prefers timed formatting from .json utterances or .srt cues. Output is
+    UTF-8 without BOM, CRLF newlines, no Concordance control characters.
+
+    Returns byte length written. Raises ValueError if the result would be empty
+    after normalization (caller should leave TEXTPATH blank).
+    """
+    body = extract_text_from_sidecar(src_txt)
+    try:
+        return write_text_bytes(body, dst_txt)
+    except ValueError as exc:
+        raise ValueError(f"empty transcript after normalize: {src_txt}") from exc
+
+
+def write_pdf_text_companion(pdf_path: Path, dst_txt: Path) -> int:
+    """
+    Extract text from ``pdf_path`` and write a Concordance TEXT companion.
+
+    Returns byte length written. Raises ValueError if empty / no extractor.
+    """
+    body = extract_pdf_text(pdf_path)
+    try:
+        return write_text_bytes(body, dst_txt)
+    except ValueError as exc:
+        raise ValueError(f"empty PDF text after normalize: {pdf_path}") from exc
+
+
+def rebuild_text_from_enriched(
+    output: Path,
+    placeholders_root: Path,
+    *,
+    skip_pdf_text: bool = False,
+    natives_src: Optional[Path] = None,
+    images_src: Optional[Path] = None,
+) -> Tuple[List[Dict[str, str]], int, int, List[str]]:
+    """
+    Re-generate TEXT companions and refresh TEXTPATH on enriched CSV rows.
+
+    - PDF natives (FILEEXT=PDF): extract from NATIVES/IMAGES PDF
+    - Media children (SOURCEFOLDER set): STT sidecar beside media
+
+    Returns (updated_rows, stt_written, pdf_written, errors).
+    """
+    enriched_csv = output / "VOL001_enriched.csv"
+    if not enriched_csv.is_file():
+        raise FileNotFoundError(f"enriched CSV not found: {enriched_csv}")
+    text_out = output / "TEXT" / "0001"
+    ensure_dir(text_out)
+
+    native_index = index_by_stem(natives_src) if natives_src else {}
+    image_index = index_by_stem(images_src) if images_src else {}
+    # Also index package NATIVES/IMAGES when present.
+    pkg_natives = output / "NATIVES"
+    pkg_images = output / "IMAGES"
+    if pkg_natives.is_dir():
+        for stem, path in index_by_stem(pkg_natives).items():
+            native_index.setdefault(stem, path)
+    if pkg_images.is_dir():
+        for stem, path in index_by_stem(pkg_images).items():
+            image_index.setdefault(stem, path)
+
+    rows: List[Dict[str, str]] = []
+    stt_written = 0
+    pdf_written = 0
+    errors: List[str] = []
+
+    with enriched_csv.open("r", encoding="utf-8-sig", newline="") as fh:
+        reader = csv.DictReader(fh)
+        for raw in reader:
+            row = {k: (raw.get(k) or "") for k in SCHEMA_FIELDS}
+            beg = row["BEGDOC"].strip()
+            if not beg:
+                rows.append(row)
+                continue
+
+            src_rel = row["SOURCEFOLDER"].strip()
+            fileext = row["FILEEXT"].strip().upper()
+            filepath = row["FILEPATH"].strip()
+            textpath = ""
+
+            # Media children: STT sidecars
+            if src_rel:
+                media = placeholders_root / src_rel.replace("\\", os.sep)
+                if media.is_file():
+                    stt = sidecar_transcript(media)
+                    if stt:
+                        try:
+                            write_text_companion(stt, text_out / f"{beg}.txt")
+                            textpath = rel_text_path(beg)
+                            stt_written += 1
+                        except (OSError, ValueError) as exc:
+                            errors.append(f"STT {beg}: {exc}")
+                else:
+                    errors.append(f"{beg}: media missing: {src_rel}")
+
+            # PDF natives: extract text (skip placeholders / non-PDF)
+            elif not skip_pdf_text and fileext == "PDF":
+                pdf = resolve_pdf_for_text(
+                    beg, filepath, output, native_index, image_index
+                )
+                if pdf is None:
+                    errors.append(f"PDF {beg}: file not found for extraction")
+                else:
+                    try:
+                        write_pdf_text_companion(pdf, text_out / f"{beg}.txt")
+                        textpath = rel_text_path(beg)
+                        pdf_written += 1
+                    except (OSError, ValueError) as exc:
+                        errors.append(f"PDF {beg}: {exc}")
+
+            # Prefer newly written companion; else keep prior TEXTPATH if file exists.
+            if textpath:
+                row["TEXTPATH"] = textpath
+            elif row["TEXTPATH"]:
+                prior = output / row["TEXTPATH"].replace("\\", os.sep)
+                if not prior.is_file():
+                    row["TEXTPATH"] = ""
+            rows.append(row)
+
+    write_enriched_csv(enriched_csv, rows)
+    return rows, stt_written, pdf_written, errors
 
 
 def write_enriched_csv(path: Path, rows: List[Dict[str, str]]) -> None:
@@ -595,7 +1007,9 @@ def write_build_report(
     lines.append(f"| Placeholders with no media folder | {len(stats.placeholders_unmapped)} |")
     lines.append(f"| Media children added | {stats.media_children} |")
     lines.append(f"| TEXT files written | {stats.text_written} |")
-    lines.append(f"| Media missing STT .txt | {len(stats.text_missing_media)} |")
+    lines.append(f"| PDF TEXT extracted | {stats.text_pdf_written} |")
+    lines.append(f"| PDF TEXT empty/failed | {len(stats.text_pdf_empty)} |")
+    lines.append(f"| Media missing STT | {len(stats.text_missing_media)} |")
     lines.append(f"| New Bates range | {stats.new_bates_start}–{stats.new_bates_end} |")
     lines.append(f"| DAT rows | {stats.dat_rows} |")
     lines.append(f"| OPT lines | {stats.opt_lines} |")
@@ -603,12 +1017,24 @@ def write_build_report(
     lines.append("")
 
     if stats.media_children:
+        stt_n = stats.text_written - stats.text_pdf_written
         pct = (
-            100.0 * stats.text_written / stats.media_children
+            100.0 * stt_n / stats.media_children
             if stats.media_children
             else 0.0
         )
-        lines.append(f"**STT coverage (media children):** {stats.text_written}/{stats.media_children} ({pct:.1f}%)")
+        lines.append(
+            f"**STT coverage (media children):** {stt_n}/{stats.media_children} ({pct:.1f}%)"
+        )
+        lines.append("")
+
+    if stats.text_pdf_empty:
+        lines.append("## PDF text extraction failures / empty")
+        lines.append("")
+        for item in stats.text_pdf_empty[:100]:
+            lines.append(f"- `{item}`")
+        if len(stats.text_pdf_empty) > 100:
+            lines.append(f"- … and {len(stats.text_pdf_empty) - 100} more")
         lines.append("")
 
     lines.append("## Placeholder → folder map")
@@ -687,8 +1113,9 @@ def write_build_report(
     lines.append("| Wrong placeholder→folder map | Explicit map in script; unmapped listed above |")
     lines.append("| OPT wrong folder/ext | OPT regenerated as `IMAGES\\0001\\{BEGDOC}.pdf` only when image exists |")
     lines.append("| FILEPATH was original Filename | Classic layout: `NATIVES\\0001\\{BEGDOC}{ext}` for every row |")
-    lines.append("| Inline STT in cp1252 DAT | TEXTPATH → UTF-8 (no BOM) `TEXT\\0001\\{BEGDOC}.txt`, CRLF, plain transcript, DAT control chars stripped |")
-    lines.append("| SRT/JSON sidecars | Prefer `.txt`; if only `.srt`, strip timestamps; never load `.json` into TEXT |")
+    lines.append("| Inline STT in cp1252 DAT | TEXTPATH → UTF-8 (no BOM) `TEXT\\0001\\{BEGDOC}.txt`, CRLF, timed transcript, DAT control chars stripped |")
+    lines.append("| SRT/JSON sidecars | Prefer `.json` utterances (timestamps + optional Speaker N), else `.srt` with `[HH:MM:SS]` markers, else plain `.txt` |")
+    lines.append("| PDF TEXT missing / bunched | Extract from native PDF (pypdf/pdfminer); page markers + paragraph newlines; optional dep in requirements.txt |")
     lines.append("| Parent-relative `..\\` paths | Classic layout uses only paths under the DAT folder |")
     lines.append("| Long Snapchat filenames | Media natives Bates-renamed under `NATIVES\\0001\\` (original name kept in FILENAME) |")
     lines.append("| Multi-GB media / Google Drive | Prefer local NTFS output with symlinks/junctions into the source volume |")
@@ -888,6 +1315,39 @@ def build_volume(args: argparse.Namespace) -> int:
         if is_ph:
             stats.placeholders.append(f"{beg} | {filename}")
 
+        # PDF extracted-text companion (UTF-8 no BOM, CRLF, page breaks).
+        textpath = ""
+        if (
+            not args.skip_pdf_text
+            and not args.dry_run
+            and not is_ph
+            and ext.lower() in PDF_EXTS
+        ):
+            pdf_src = native if native and native.is_file() else None
+            if pdf_src is None and img is not None and img.suffix.lower() in PDF_EXTS:
+                pdf_src = img
+            if pdf_src is not None:
+                text_dst = text_out / f"{beg}.txt"
+                try:
+                    write_pdf_text_companion(pdf_src, text_dst)
+                    textpath = rel_text_path(beg)
+                    stats.text_written += 1
+                    stats.text_pdf_written += 1
+                except (OSError, ValueError) as exc:
+                    stats.text_pdf_empty.append(f"{beg} | {filename}: {exc}")
+            else:
+                stats.text_pdf_empty.append(f"{beg} | {filename}: PDF not on disk")
+        elif (
+            not args.skip_pdf_text
+            and args.dry_run
+            and not is_ph
+            and ext.lower() in PDF_EXTS
+            and (native or (img and img.suffix.lower() in PDF_EXTS))
+        ):
+            textpath = rel_text_path(beg)
+            stats.text_written += 1
+            stats.text_pdf_written += 1
+
         add_row(
             {
                 "BEGDOC": beg,
@@ -899,7 +1359,7 @@ def build_volume(args: argparse.Namespace) -> int:
                 "FILEPATH": filepath,
                 "FILENAME": filename,
                 "FILEEXT": fileext,
-                "TEXTPATH": "",
+                "TEXTPATH": textpath,
                 "DOCTYPE": doctype_for(filename, False),
                 "SOURCEFOLDER": "",
             }
@@ -1194,9 +1654,77 @@ def build_volume(args: argparse.Namespace) -> int:
     return 0
 
 
+def rebuild_text_package(args: argparse.Namespace) -> int:
+    """
+    Rebuild TEXT companions + TEXTPATH + DAT for an existing LOAD package.
+
+    Does not re-expand Bates or re-copy natives. Requires VOL001_enriched.csv
+    under --output and (for media STT) Items with Placeholders under --source.
+    """
+    source = Path(args.source).resolve()
+    if args.output:
+        output = Path(args.output).resolve()
+    else:
+        output = source / "VOL001_LOAD"
+    repo = Path(args.repo).resolve() if args.repo else Path(__file__).resolve().parents[1]
+    schema_file = repo / "schemas" / "davila_load.txt"
+    placeholders_root = source / "Items with Placeholders"
+    natives_src = source / "NATIVES"
+    images_src = source / "IMAGES"
+
+    if not (output / "VOL001_enriched.csv").is_file():
+        print(f"ERROR: enriched CSV not found under {output}", file=sys.stderr)
+        return 1
+    if not schema_file.is_file():
+        print(f"ERROR: schema not found: {schema_file}", file=sys.stderr)
+        return 1
+
+    print(f"Rebuilding TEXT under {output / 'TEXT' / '0001'}")
+    rows, stt_n, pdf_n, errors = rebuild_text_from_enriched(
+        output,
+        placeholders_root,
+        skip_pdf_text=bool(args.skip_pdf_text),
+        natives_src=natives_src if natives_src.is_dir() else None,
+        images_src=images_src if images_src.is_dir() else None,
+    )
+    print(f"  STT TEXT written: {stt_n}")
+    print(f"  PDF TEXT written: {pdf_n}")
+    if errors:
+        print(f"  TEXT errors: {len(errors)}")
+        for e in errors[:30]:
+            print(f"    {e}")
+
+    enriched_csv = output / "VOL001_enriched.csv"
+    dat_out = output / "VOL001.dat"
+    if not args.dry_run:
+        try:
+            run_csv_to_dat(repo, enriched_csv, dat_out, schema_file)
+            print(f"  DAT rebuilt: {dat_out}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"ERROR: csv2dat failed: {exc}", file=sys.stderr)
+            traceback.print_exc()
+            return 1
+
+        missing_tp = [
+            r["BEGDOC"]
+            for r in rows
+            if (r.get("TEXTPATH") or "")
+            and not (output / r["TEXTPATH"].replace("\\", os.sep)).is_file()
+        ]
+        if missing_tp:
+            print(f"ERROR: {len(missing_tp)} TEXTPATH targets missing", file=sys.stderr)
+            return 1
+
+    # Soft-fail on extraction errors (image-only PDFs are expected).
+    print(f"Rows: {len(rows)}; TEXTPATH set: {sum(1 for r in rows if r.get('TEXTPATH'))}")
+    return 0
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entry point."""
     args = parse_args(argv)
+    if args.rebuild_text:
+        return rebuild_text_package(args)
     return build_volume(args)
 
 

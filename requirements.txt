@@ -1,4 +1,10 @@
-# csv_to_dat runtime dependencies: none (Python 3.8+ standard library only).
+# csv_to_dat core runtime: Python 3.8+ standard library only.
+#
+# Optional — PDF TEXT extraction for scripts/enrich_volume.py
+# (Concordance TEXTPATH companions from native PDFs):
+pypdf>=4.0
+# pdfminer.six>=20221105  # fallback if pypdf unavailable
+# pymupdf>=1.24           # alternate fallback
 #
 # Optional test dependency:
 pytest>=7.0
