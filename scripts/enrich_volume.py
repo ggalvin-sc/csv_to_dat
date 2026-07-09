@@ -212,12 +212,16 @@ def ensure_dir(path: Path) -> None:
 
 
 def index_by_stem(folder: Path) -> Dict[str, Path]:
-    """Map file stem (case-sensitive as on disk) -> Path for all files under folder."""
+    """Map file stem (case-sensitive as on disk) -> Path for all files under folder.
+
+    Skips Windows junk (desktop.ini, Thumbs.db) so they are never treated as natives.
+    """
+    skip_names = {"desktop.ini", "thumbs.db", ".ds_store"}
     out: Dict[str, Path] = {}
     if not folder.is_dir():
         return out
     for p in folder.rglob("*"):
-        if p.is_file():
+        if p.is_file() and p.name.lower() not in skip_names:
             out[p.stem] = p
     return out
 
@@ -1121,7 +1125,10 @@ def write_build_report(
     lines.append("| Multi-GB media / Google Drive | Prefer local NTFS output with symlinks/junctions into the source volume |")
     lines.append("| Incident 4.26.24 pt 2 | Same folder as pt 1 — children attached only to pt 1 to avoid duplicates |")
     lines.append("| 12.5.24 placeholders | No media folders present — parents only, blank TEXTPATH |")
-    lines.append("| Family integrity | Children set BEGATTACH/ENDATTACH = parent Bates |")
+    lines.append(
+        "| Family integrity | Parent + children share BEGATTACH=parent and "
+        "ENDATTACH=last child Bates |"
+    )
     lines.append("| Case data on GitHub | Output stays under case/local build folder; not committed to csv_to_dat |")
     lines.append("")
     lines.append("## Load checklist")
@@ -1404,19 +1411,35 @@ def build_volume(args: argparse.Namespace) -> int:
 
             media_files = list_media_files(folder)
             expanded_folders[folder_name] = parent
+            # Collect child Bates first so every family member (parent + children)
+            # can share BEGATTACH=parent and ENDATTACH=last child.
+            family_child_bates: List[str] = []
+            pending_children: List[Tuple[str, Path, str, str, str]] = []
+            # (child_bates, media, ext, filepath, rel_src)
             for media in media_files:
                 child_bates = format_bates(prefix, next_num, width)
                 next_num += 1
                 stats.media_children += 1
                 ext = media.suffix
                 rel_src = str(media.relative_to(placeholders_root)).replace("/", "\\")
-                fileext = ext.lstrip(".").upper()
-
                 if layout == "classic":
                     filepath = rel_native_path(child_bates, ext)
                     media_placements.append((child_bates, media, ext))
                 else:
                     filepath = rel_between(output, media)
+                family_child_bates.append(child_bates)
+                pending_children.append((child_bates, media, ext, filepath, rel_src))
+
+            end_attach = family_child_bates[-1] if family_child_bates else parent
+            # Stamp family range on the parent row (already in enriched).
+            for row in enriched:
+                if row["BEGDOC"] == parent:
+                    row["BEGATTACH"] = parent
+                    row["ENDATTACH"] = end_attach
+                    break
+
+            for child_bates, media, ext, filepath, rel_src in pending_children:
+                fileext = ext.lstrip(".").upper()
 
                 # TEXT companion — UTF-8 no BOM, CRLF, plain transcript
                 textpath = ""
@@ -1445,7 +1468,7 @@ def build_volume(args: argparse.Namespace) -> int:
                         "BEGDOC": child_bates,
                         "ENDDOC": child_bates,
                         "BEGATTACH": parent,
-                        "ENDATTACH": parent,
+                        "ENDATTACH": end_attach,
                         "CUSTODIAN": "",
                         "CODED": "",
                         "FILEPATH": filepath,
