@@ -1,0 +1,14 @@
+# Davila / KVH production load schema for --merge-schema.
+# One field name per line. Blank lines and # comments are ignored.
+BEGDOC
+ENDDOC
+BEGATTACH
+ENDATTACH
+CUSTODIAN
+CODED
+FILEPATH
+FILENAME
+FILEEXT
+TEXTPATH
+DOCTYPE
+SOURCEFOLDER

@@ -185,6 +185,27 @@ $bytes = [System.IO.File]::ReadAllBytes(".\VOL001.dat")
 
 A classic cp1252 DAT starts with byte `FE` (not UTF-8 `C3 BE`).
 
+## Build a load package from a thin volume CSV
+
+When a producing party ships Bates + Filename only (no native paths / no
+TEXTPATH), use `scripts/enrich_volume.py` to expand placeholder media into
+child Bates, write Concordance `TEXT\0001\{BEGDOC}.txt` from STT sidecars, and
+emit a validated DAT/DCT/OPT package:
+
+```powershell
+python .\scripts\enrich_volume.py `
+  --source "G:\path\to\volume_folder"
+
+# or:
+powershell -File .\scripts\build_concordance_volume.ps1 `
+  -Source "G:\path\to\volume_folder"
+```
+
+Output lands in `<source>\VOL001_LOAD\` (DAT, DCT, OPT, enriched CSV, TEXT,
+`build_report.md`). Native/image paths are relative (`..\NATIVES\…`,
+`..\IMAGES\…`) so the package must stay inside the source volume. Schema:
+[`schemas/davila_load.txt`](schemas/davila_load.txt).
+
 ## Tests
 
 ```powershell
