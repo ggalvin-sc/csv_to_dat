@@ -86,7 +86,7 @@ SCHEMA_FIELDS = [
 ]
 
 # Explicit map: CSV placeholder Filename (case-insensitive) -> folder under
-# Items with Placeholders. Unmapped placeholders get no children.
+# Items with Placeholders (may be a nested subfolder). Unmapped / None = no children.
 PLACEHOLDER_FOLDER_MAP: Dict[str, Optional[str]] = {
     "placeholder - snapchat.docx": "SNAPCHAT",
     "placeholder - jail calls.docx": "JAIL CALLS",
@@ -94,9 +94,16 @@ PLACEHOLDER_FOLDER_MAP: Dict[str, Optional[str]] = {
     "placeholder - incident 4.26.24 pt 1.docx": "Incident 4.26.24",
     "placeholder - incident 4.26.24 pt 2.docx": None,  # same folder as pt1; avoid dup
     "placeholder - incident 12.2.24.docx": "Incident 12.2.24",
-    "placeholder - incident 12.5.24 body cam.docx": None,  # no media folder
-    "placeholder - incident 12.5.24 in car video.docx": None,
-    "placeholder - incident 12.5.24 911 recordings.docx": None,
+    # 12.5.24 media lives in Prop # subfolders (not the parent Incident folder alone).
+    "placeholder - incident 12.5.24 body cam.docx": (
+        "Incident 12.5.24\\Prop #339529 - Body Cam"
+    ),
+    "placeholder - incident 12.5.24 in car video.docx": (
+        "Incident 12.5.24\\Prop #339530 - In Car Video"
+    ),
+    "placeholder - incident 12.5.24 911 recordings.docx": (
+        "Incident 12.5.24\\Prop #339321 - 911 Recordings"
+    ),
 }
 
 
@@ -1245,11 +1252,14 @@ def write_build_report(
             "symlinks/junctions into the source volume |"
         )
     lines.append("| Incident 4.26.24 pt 2 | Same folder as pt 1 — children attached only to pt 1 to avoid duplicates |")
-    lines.append("| 12.5.24 placeholders | No media folders present — parents only, blank TEXTPATH |")
     lines.append(
-        "| Family integrity | Parent + children share BEGATTACH=ENDATTACH=parent "
-        "(parent-only; children Bates are non-contiguous so last-child ENDATTACH "
-        "would falsely span unrelated docs) |"
+        "| 12.5.24 placeholders | Map to Prop # subfolders "
+        "(Body Cam / In Car Video / 911 Recordings) under Incident 12.5.24 |"
+    )
+    lines.append(
+        "| Family integrity | Children: BEGATTACH=ENDATTACH=parent; parents blank. "
+        "Do not set ENDATTACH=last child (non-contiguous Bates would falsely span "
+        "unrelated docs between parent and children) |"
     )
     lines.append("| Case data on GitHub | Output stays under case/local build folder; not committed to csv_to_dat |")
     lines.append("")
@@ -1569,7 +1579,9 @@ def build_volume(args: argparse.Namespace) -> int:
                 )
                 continue
 
-            folder = placeholders_root / folder_name
+            folder = placeholders_root.joinpath(
+                *folder_name.replace("\\", "/").split("/")
+            )
             if not folder.is_dir():
                 stats.errors.append(f"mapped folder missing for {filename}: {folder}")
                 stats.placeholders_unmapped.append(
@@ -1579,14 +1591,10 @@ def build_volume(args: argparse.Namespace) -> int:
 
             media_files = list_media_files(folder)
             expanded_folders[folder_name] = parent
-            # Family attach fields: BEGATTACH=ENDATTACH=parent on every member.
-            #
-            # Why not ENDATTACH=last child (classic contiguous Concordance range)?
-            # Media children are Bates-appended after the original volume
-            # (e.g. parent 000001, children 001360–001363). A last-child
-            # ENDATTACH would imply a false contiguous family spanning every
-            # unrelated Bates between parent and last child. Parent-only
-            # attach fields identify the family without that false range.
+            # Parents keep blank BEGATTACH/ENDATTACH. Children get
+            # BEGATTACH=ENDATTACH=parent (not last-child — child Bates are
+            # non-contiguous with the parent, so a range would falsely span
+            # unrelated documents between them).
             pending_children: List[Tuple[str, Path, str, str, str]] = []
             # (child_bates, media, ext, filepath, rel_src)
             for media in media_files:
@@ -1602,12 +1610,7 @@ def build_volume(args: argparse.Namespace) -> int:
                     filepath = rel_between(output, media)
                 pending_children.append((child_bates, media, ext, filepath, rel_src))
 
-            # Stamp family id on the parent row (already in enriched).
-            for row in enriched:
-                if row["BEGDOC"] == parent:
-                    row["BEGATTACH"] = parent
-                    row["ENDATTACH"] = parent
-                    break
+            # Parents intentionally left with blank attach fields.
 
             for child_bates, media, ext, filepath, rel_src in pending_children:
                 fileext = ext.lstrip(".").upper()
