@@ -7,8 +7,12 @@ PAGE PURPOSE
 Takes a producing-party volume that has Bates + Filename only (no native paths,
 no TEXTPATH) and builds a sibling VOL001_LOAD package with:
 
-  * Bates-relative FILEPATH into NATIVES\\0001\\
-  * Expanded child Bates for media under Items with Placeholders
+  * **Bates-centric join (authoritative):** for each CSV BEGDOC, look up
+    NATIVES/**/{BEGDOC}.*, IMAGES/**/{BEGDOC}.*, TEXT/0001/{BEGDOC}.txt
+    and fill FILEPATH/FILEEXT/TEXTPATH from the files found — never invent
+    FILEPATH from the CSV Filename string (producing party already Bates-renamed).
+  * FILENAME keeps the original CSV Filename metadata.
+  * Expanded child Bates for media under Items with Placeholders (still Bates-named).
   * TEXT\\0001\\{BEGDOC}.txt companions from:
       - PDF natives: extracted text (pypdf / pdfminer) with page/paragraph breaks
       - Media children: STT sidecars (prefer JSON utterances, else SRT, else .txt)
@@ -17,15 +21,17 @@ no TEXTPATH) and builds a sibling VOL001_LOAD package with:
     relative to the volume root (parent of DATA/NATIVES/IMAGES/TEXT)
   * --link-mode copy / --self-contained: real file copies only (no Drive
     symlinks or directory junctions)
-  * build_report.md (coverage, Bates map, countervoice notes)
+  * build_report.md + bates_join_report.md (per-Bates native/image/text audit)
 
 FUNCTIONS
 ---------
   parse_args()              CLI for source/output/repo paths and dry-run.
   bates_number()            Extract trailing integer from a Bates ID.
   format_bates()            Build Bates ID from prefix + number.
-  index_natives()           Map Bates stem -> absolute native path.
-  index_images()            Map Bates stem -> absolute image path.
+  index_by_stem()           Map Bates stem -> absolute path (authoritative index).
+  join_bates_to_files()     Bates ID -> native/image/text paths on disk.
+  audit_bates_join()        Per-CSV-Bates Y/N audit rows (native/image/text).
+  write_bates_join_report() Markdown join logic + sample + full audit table.
   load_csv_rows()           Read thin volume CSV (Bates/Filename columns).
   placeholder_folder_map()  Explicit PLACEHOLDER filename -> media folder.
   list_media_files()        Recurse for mp4/mp3/wav/m4a under a folder.
@@ -38,13 +44,14 @@ FUNCTIONS
   write_text_companion()    STT sidecar -> TEXT companion.
   write_pdf_text_companion() PDF path -> TEXT companion.
   rebuild_text_from_enriched()  Re-write TEXT\\0001 + TEXTPATH from enriched CSV.
+  rebuild_bates_join_package()  Re-join CSV Bates -> files; refresh DATA without full re-copy.
   copy_or_link()            Hardlink when possible, else copy2 with retries.
   place_file()              Symlink/hardlink/copy a single file into the package.
   ensure_junction_or_link() Directory junction/symlink helper (not used in copy mode).
   is_self_contained()       True when build must use real copies only.
   write_readme_load()       Write README_LOAD.txt for the volume root.
   ensure_dir()              mkdir -p helper.
-  build_volume()            Main pipeline: inventory -> expand -> TEXT -> DAT.
+  build_volume()            Main pipeline: Bates join -> expand -> TEXT -> DAT.
   write_build_report()      Markdown report with coverage + countervoice.
   main()                    Entry point.
 """
@@ -108,6 +115,38 @@ PLACEHOLDER_FOLDER_MAP: Dict[str, Optional[str]] = {
 
 
 @dataclass
+class BatesJoinResult:
+    """Result of joining one Bates ID to files on disk (authoritative path)."""
+
+    begdoc: str
+    native: Optional[Path] = None
+    image: Optional[Path] = None
+    text: Optional[Path] = None
+    csv_filename: str = ""
+    enddoc: str = ""
+    coded: str = ""
+
+    @property
+    def native_found(self) -> bool:
+        return self.native is not None and self.native.is_file()
+
+    @property
+    def image_found(self) -> bool:
+        return self.image is not None and self.image.is_file()
+
+    @property
+    def text_found(self) -> bool:
+        return self.text is not None and self.text.is_file()
+
+    @property
+    def native_ext(self) -> str:
+        """Extension from Bates-matched native only (never from CSV Filename)."""
+        if self.native_found and self.native is not None:
+            return self.native.suffix
+        return ""
+
+
+@dataclass
 class BuildStats:
     source_rows: int = 0
     natives_joined: int = 0
@@ -128,6 +167,7 @@ class BuildStats:
     # (child_bates, parent_bates, filename, textpath_or_blank)
     opt_lines: int = 0
     dat_rows: int = 0
+    bates_join_audit: List[Dict[str, str]] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
 
@@ -212,6 +252,14 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         "Use --output for the LOAD package; --source for Items with Placeholders.",
     )
     p.add_argument(
+        "--rebuild-join",
+        action="store_true",
+        help="Re-assemble DATA (enriched CSV + DAT + OPT) using Bates-centric "
+        "join against an existing package. Prefer package NATIVES/IMAGES/TEXT; "
+        "only re-copy natives when Bates stem mismatches are found. "
+        "Preserves media-child rows from existing enriched CSV.",
+    )
+    p.add_argument(
         "--skip-pdf-text",
         action="store_true",
         help="Do not extract text from PDF natives into TEXT companions",
@@ -256,6 +304,7 @@ def index_by_stem(folder: Path) -> Dict[str, Path]:
     """Map file stem (case-sensitive as on disk) -> Path for all files under folder.
 
     Skips Windows junk (desktop.ini, Thumbs.db) so they are never treated as natives.
+    This is the authoritative Bates → file index for the loadfile join.
     """
     skip_names = {"desktop.ini", "thumbs.db", ".ds_store"}
     out: Dict[str, Path] = {}
@@ -265,6 +314,222 @@ def index_by_stem(folder: Path) -> Dict[str, Path]:
         if p.is_file() and p.name.lower() not in skip_names:
             out[p.stem] = p
     return out
+
+
+def merge_stem_indexes(*indexes: Dict[str, Path]) -> Dict[str, Path]:
+    """Merge stem indexes; earlier indexes win (prefer package over source)."""
+    out: Dict[str, Path] = {}
+    for idx in reversed(indexes):
+        out.update(idx)
+    return out
+
+
+def join_bates_to_files(
+    begdoc: str,
+    *,
+    native_index: Dict[str, Path],
+    image_index: Dict[str, Path],
+    text_index: Optional[Dict[str, Path]] = None,
+    csv_filename: str = "",
+    enddoc: str = "",
+    coded: str = "",
+) -> BatesJoinResult:
+    """
+    Authoritative Bates-centric join: BEGDOC → native / image / text on disk.
+
+    FILEPATH and FILEEXT must come from the Bates-matched native only.
+    CSV Filename is metadata for the FILENAME field — never used to invent paths.
+    """
+    beg = begdoc.strip()
+    text_idx = text_index or {}
+    return BatesJoinResult(
+        begdoc=beg,
+        native=native_index.get(beg),
+        image=image_index.get(beg),
+        text=text_idx.get(beg),
+        csv_filename=csv_filename,
+        enddoc=(enddoc or beg).strip() or beg,
+        coded=(coded or "").strip(),
+    )
+
+
+def filepath_from_bates_join(join: BatesJoinResult) -> Tuple[str, str]:
+    """
+    Build classic FILEPATH + FILEEXT from a Bates join result.
+
+    Returns (filepath, fileext). FILEPATH is blank when no native was found —
+    never derived from csv_filename.
+    """
+    if not join.native_found or join.native is None:
+        return "", ""
+    ext = join.native.suffix
+    return rel_native_path(join.begdoc, ext), ext.lstrip(".").upper()
+
+
+def textpath_from_bates_join(join: BatesJoinResult) -> str:
+    """Return TEXT\\0001\\{BEGDOC}.txt only when a text companion exists for that Bates."""
+    if join.text_found:
+        return rel_text_path(join.begdoc)
+    return ""
+
+
+def audit_bates_join_row(join: BatesJoinResult) -> Dict[str, str]:
+    """One audit row: native/image/text Y/N + CSV Filename for a Bates ID."""
+    return {
+        "BEGDOC": join.begdoc,
+        "ENDDOC": join.enddoc,
+        "CSV_FILENAME": join.csv_filename,
+        "NATIVE_FOUND": "Y" if join.native_found else "N",
+        "NATIVE_NAME": join.native.name if join.native_found and join.native else "",
+        "IMAGE_FOUND": "Y" if join.image_found else "N",
+        "IMAGE_NAME": join.image.name if join.image_found and join.image else "",
+        "TEXT_FOUND": "Y" if join.text_found else "N",
+        "TEXT_NAME": join.text.name if join.text_found and join.text else "",
+        "FILEEXT": join.native_ext.lstrip(".").upper() if join.native_found else "",
+    }
+
+
+def audit_bates_join(
+    thin_rows: Sequence[Dict[str, str]],
+    *,
+    native_index: Dict[str, Path],
+    image_index: Dict[str, Path],
+    text_index: Optional[Dict[str, Path]] = None,
+) -> List[Dict[str, str]]:
+    """Audit every CSV Bates: native/image/text found? + CSV Filename recorded."""
+    rows: List[Dict[str, str]] = []
+    for r in thin_rows:
+        join = join_bates_to_files(
+            r["BEGDOC"],
+            native_index=native_index,
+            image_index=image_index,
+            text_index=text_index,
+            csv_filename=r.get("FILENAME", ""),
+            enddoc=r.get("ENDDOC", ""),
+            coded=r.get("CODED", ""),
+        )
+        rows.append(audit_bates_join_row(join))
+    return rows
+
+
+def write_bates_join_report(
+    path: Path,
+    *,
+    source: Path,
+    output: Path,
+    audit_rows: Sequence[Dict[str, str]],
+    sample_enriched: Sequence[Dict[str, str]],
+    dat_rows: int,
+    media_children: int,
+) -> None:
+    """Write bates_join_report.md explaining Bates→file join logic and audit."""
+    n = len(audit_rows)
+    native_y = sum(1 for r in audit_rows if r.get("NATIVE_FOUND") == "Y")
+    image_y = sum(1 for r in audit_rows if r.get("IMAGE_FOUND") == "Y")
+    text_y = sum(1 for r in audit_rows if r.get("TEXT_FOUND") == "Y")
+    lines: List[str] = [
+        "# Bates-centric join report",
+        "",
+        f"- Generated: `{datetime.now(timezone.utc).isoformat()}`",
+        f"- Source: `{source}`",
+        f"- Output: `{output}`",
+        "",
+        "## Join model (authoritative)",
+        "",
+        "```",
+        "CSV row  BEGDOC = DAVILLA_RESTRICTED_ACCESS_000001",
+        "            │",
+        "            ▼",
+        "   index_by_stem(NATIVES) ──► NATIVES/**/{BEGDOC}.*  → FILEPATH, FILEEXT",
+        "   index_by_stem(IMAGES)  ──► IMAGES/**/{BEGDOC}.*   → OPT image",
+        "   TEXT/0001/{BEGDOC}.txt ──► TEXT companion         → TEXTPATH",
+        "            │",
+        "            ▼",
+        "   FILENAME = CSV Filename (metadata only — never invents FILEPATH)",
+        "   ENDDOC   = CSV End Bates",
+        "   CODED    = CSV Coded",
+        "```",
+        "",
+        "**Rule:** Do not invent `FILEPATH` from the original Filename string.",
+        "The producing party already Bates-renamed natives; the join key is always BEGDOC.",
+        "",
+        "## Pipeline chart",
+        "",
+        "```mermaid",
+        "flowchart LR",
+        "  CSV[\"CSV Bates / Filename\"] --> JOIN[\"Bates stem join\"]",
+        "  NAT[\"NATIVES/**/{BEGDOC}.*\"] --> JOIN",
+        "  IMG[\"IMAGES/**/{BEGDOC}.*\"] --> JOIN",
+        "  TXT[\"TEXT/0001/{BEGDOC}.txt\"] --> JOIN",
+        "  JOIN --> DAT[\"DAT fields\"]",
+        "  DAT --> FP[\"FILEPATH = NATIVES\\\\0001\\\\{BEGDOC}{ext}\"]",
+        "  DAT --> FN[\"FILENAME = CSV Filename\"]",
+        "  DAT --> FE[\"FILEEXT from native\"]",
+        "  DAT --> TP[\"TEXTPATH if text exists\"]",
+        "```",
+        "",
+        "## Summary counts (original CSV Bates)",
+        "",
+        "| Metric | Value |",
+        "|---|---|",
+        f"| CSV Bates audited | {n} |",
+        f"| Native found | {native_y} / {n} |",
+        f"| Image found | {image_y} / {n} |",
+        f"| Text found | {text_y} / {n} |",
+        f"| DAT rows (incl. media children) | {dat_rows} |",
+        f"| Media children | {media_children} |",
+        "",
+        "## Sample enriched rows (Bates → paths)",
+        "",
+        "| BEGDOC | FILENAME (CSV) | FILEPATH | FILEEXT | TEXTPATH |",
+        "|---|---|---|---|---|",
+    ]
+    for r in list(sample_enriched)[:12]:
+        lines.append(
+            f"| `{r.get('BEGDOC','')}` | `{r.get('FILENAME','')}` | "
+            f"`{r.get('FILEPATH','')}` | `{r.get('FILEEXT','')}` | "
+            f"`{r.get('TEXTPATH','')}` |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Full Bates audit (native / image / text)",
+            "",
+            "| BEGDOC | Native | Image | Text | CSV Filename | FILEEXT |",
+            "|---|---|---|---|---|---|",
+        ]
+    )
+    for r in audit_rows:
+        safe_fn = (r.get("CSV_FILENAME") or "").replace("|", "/")
+        lines.append(
+            f"| `{r['BEGDOC']}` | {r['NATIVE_FOUND']} | {r['IMAGE_FOUND']} | "
+            f"{r['TEXT_FOUND']} | `{safe_fn}` | `{r.get('FILEEXT','')}` |"
+        )
+    missing_n = [r["BEGDOC"] for r in audit_rows if r.get("NATIVE_FOUND") != "Y"]
+    missing_i = [r["BEGDOC"] for r in audit_rows if r.get("IMAGE_FOUND") != "Y"]
+    if missing_n:
+        lines.extend(["", "## Missing natives", ""])
+        for b in missing_n:
+            lines.append(f"- `{b}`")
+    if missing_i:
+        lines.extend(["", "## Missing images", ""])
+        for b in missing_i[:50]:
+            lines.append(f"- `{b}`")
+        if len(missing_i) > 50:
+            lines.append(f"- … and {len(missing_i) - 50} more")
+    lines.extend(
+        [
+            "",
+            "## Media children (still Bates-centric)",
+            "",
+            "- Parent Bates → parent native by Bates stem",
+            "- Each media child gets a new Bates → `NATIVES\\0001\\{NEW_BATES}{ext}`",
+            "- TEXT named `{NEW_BATES}.txt` when STT exists",
+            "- Children: `BEGATTACH`/`ENDATTACH` = parent Bates; parents blank",
+            "",
+        ]
+    )
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def load_csv_rows(csv_path: Path) -> Tuple[List[str], List[Dict[str, str]]]:
@@ -1235,7 +1500,7 @@ def write_build_report(
     lines.append("| Bates expansion vs producing party 342 | Original Bates kept; children start after max existing number |")
     lines.append("| Wrong placeholder→folder map | Explicit map in script; unmapped listed above |")
     lines.append("| OPT wrong folder/ext | OPT regenerated as `IMAGES\\0001\\{BEGDOC}.pdf` only when image exists |")
-    lines.append("| FILEPATH was original Filename | Classic layout: `NATIVES\\0001\\{BEGDOC}{ext}` for every row |")
+    lines.append("| FILEPATH invented from Filename | Bates join only: `NATIVES\\0001\\{BEGDOC}{ext}` from `index_by_stem`; Filename stays in FILENAME field |")
     lines.append("| Inline STT in cp1252 DAT | TEXTPATH → UTF-8 (no BOM) `TEXT\\0001\\{BEGDOC}.txt`, CRLF, timed transcript, DAT control chars stripped |")
     lines.append("| SRT/JSON sidecars | Prefer `.json` utterances (timestamps + optional Speaker N), else `.srt` with `[HH:MM:SS]` markers, else plain `.txt` |")
     lines.append("| PDF TEXT missing / bunched | Extract from native PDF (pypdf/pdfminer); page markers + paragraph newlines; optional dep in requirements.txt |")
@@ -1435,6 +1700,8 @@ def build_volume(args: argparse.Namespace) -> int:
 
     native_index = index_by_stem(natives_src)
     image_index = index_by_stem(images_src)
+    # Prefer existing package TEXT when present (rebuild / incremental).
+    text_index = index_by_stem(output / "TEXT") if (output / "TEXT").is_dir() else {}
 
     # Determine Bates prefix + next number from existing IDs.
     prefix = bates_prefix(thin_rows[0]["BEGDOC"])
@@ -1463,36 +1730,40 @@ def build_volume(args: argparse.Namespace) -> int:
         used_bates.add(b)
         enriched.append(row)
 
-    # --- Pass 1: existing CSV rows ---
+    # --- Pass 1: Bates-centric join for every CSV row ---
+    # Key = BEGDOC. Look up NATIVES/IMAGES/TEXT by Bates stem.
+    # FILENAME = CSV Filename (metadata). FILEPATH never invented from Filename.
     for r in thin_rows:
         beg = r["BEGDOC"]
-        end = r["ENDDOC"]
         filename = r["FILENAME"]
-        coded = r["CODED"]
-        native = native_index.get(beg)
-        if native:
+        join = join_bates_to_files(
+            beg,
+            native_index=native_index,
+            image_index=image_index,
+            text_index=text_index,
+            csv_filename=filename,
+            enddoc=r["ENDDOC"],
+            coded=r["CODED"],
+        )
+        stats.bates_join_audit.append(audit_bates_join_row(join))
+
+        if join.native_found and join.native is not None:
             stats.natives_joined += 1
-            ext = native.suffix
-            fileext = ext.lstrip(".").upper()
-            native_placements.append((beg, native))
+            native_placements.append((beg, join.native))
         else:
             stats.natives_missing.append(beg)
-            ext = Path(filename).suffix or ".bin"
-            fileext = ext.lstrip(".").upper()
-            stats.warnings.append(f"no native on disk for {beg}")
+            stats.warnings.append(f"no native on disk for {beg} (Bates join miss)")
 
-        if layout == "classic":
-            filepath = rel_native_path(beg, ext)
-        else:
-            if native:
-                filepath = rel_between(output, native)
+        filepath, fileext = filepath_from_bates_join(join)
+        if layout != "classic":
+            if join.native_found and join.native is not None:
+                filepath = rel_between(output, join.native)
             else:
-                filepath = rel_between(output, natives_src / "0001" / f"{beg}{ext}")
+                filepath = ""
 
-        img = image_index.get(beg)
-        if img:
+        if join.image_found and join.image is not None:
             stats.images_joined += 1
-            image_placements.append((beg, img))
+            image_placements.append((beg, join.image))
         else:
             stats.images_missing.append(beg)
 
@@ -1501,21 +1772,30 @@ def build_volume(args: argparse.Namespace) -> int:
             stats.placeholders.append(f"{beg} | {filename}")
 
         # PDF extracted-text companion (UTF-8 no BOM, CRLF, page breaks).
-        textpath = ""
+        # TEXT file is always named {BEGDOC}.txt to match Bates.
+        textpath = textpath_from_bates_join(join)
+        native_ext = join.native_ext.lower() if join.native_found else ""
         if (
-            not args.skip_pdf_text
+            not textpath
+            and not args.skip_pdf_text
             and not args.dry_run
             and not is_ph
-            and ext.lower() in PDF_EXTS
+            and native_ext in PDF_EXTS
         ):
-            pdf_src = native if native and native.is_file() else None
-            if pdf_src is None and img is not None and img.suffix.lower() in PDF_EXTS:
-                pdf_src = img
+            pdf_src = join.native if join.native_found else None
+            if (
+                pdf_src is None
+                and join.image_found
+                and join.image is not None
+                and join.image.suffix.lower() in PDF_EXTS
+            ):
+                pdf_src = join.image
             if pdf_src is not None:
                 text_dst = text_out / f"{beg}.txt"
                 try:
                     write_pdf_text_companion(pdf_src, text_dst)
                     textpath = rel_text_path(beg)
+                    text_index[beg] = text_dst
                     stats.text_written += 1
                     stats.text_pdf_written += 1
                 except (OSError, ValueError) as exc:
@@ -1523,11 +1803,12 @@ def build_volume(args: argparse.Namespace) -> int:
             else:
                 stats.text_pdf_empty.append(f"{beg} | {filename}: PDF not on disk")
         elif (
-            not args.skip_pdf_text
+            not textpath
+            and not args.skip_pdf_text
             and args.dry_run
             and not is_ph
-            and ext.lower() in PDF_EXTS
-            and (native or (img and img.suffix.lower() in PDF_EXTS))
+            and native_ext in PDF_EXTS
+            and (join.native_found or (join.image_found and join.image and join.image.suffix.lower() in PDF_EXTS))
         ):
             textpath = rel_text_path(beg)
             stats.text_written += 1
@@ -1536,13 +1817,13 @@ def build_volume(args: argparse.Namespace) -> int:
         add_row(
             {
                 "BEGDOC": beg,
-                "ENDDOC": end,
+                "ENDDOC": join.enddoc,
                 "BEGATTACH": "",
                 "ENDATTACH": "",
                 "CUSTODIAN": "",
-                "CODED": coded,
+                "CODED": join.coded,
                 "FILEPATH": filepath,
-                "FILENAME": filename,
+                "FILENAME": filename,  # CSV metadata — not used for path join
                 "FILEEXT": fileext,
                 "TEXTPATH": textpath,
                 "DOCTYPE": doctype_for(filename, False),
@@ -1870,11 +2151,23 @@ def build_volume(args: argparse.Namespace) -> int:
         self_contained=self_contained,
     )
 
+    join_report_path = output / "bates_join_report.md"
+    write_bates_join_report(
+        join_report_path,
+        source=source,
+        output=output,
+        audit_rows=stats.bates_join_audit,
+        sample_enriched=enriched,
+        dat_rows=stats.dat_rows,
+        media_children=stats.media_children,
+    )
+
     print(f"Layout:       {layout}")
     print(f"Self-contained: {self_contained}")
     print(f"Data dir:     {data_out}")
     print(f"Enriched CSV: {enriched_csv}")
     print(f"Report:       {report_path}")
+    print(f"Bates join:   {join_report_path}")
     print(
         f"DAT rows:     {stats.dat_rows} "
         f"(source {stats.source_rows} + media {stats.media_children})"
@@ -1955,9 +2248,254 @@ def rebuild_text_package(args: argparse.Namespace) -> int:
     return 0
 
 
+def rebuild_bates_join_package(args: argparse.Namespace) -> int:
+    """
+    Re-assemble DATA using Bates-centric join against an existing package.
+
+    - Original 342 rows: re-join CSV BEGDOC → package/source NATIVES/IMAGES/TEXT
+    - Media children: preserved from existing enriched CSV (already Bates-named)
+    - FILEPATH/FILEEXT always from Bates-matched native (never CSV Filename)
+    - Re-copy a native only when package stem/ext mismatches the join
+    - Regenerates enriched CSV + DAT + OPT + bates_join_report.md
+    """
+    source = Path(args.source).resolve()
+    if args.output:
+        output = Path(args.output).resolve()
+    else:
+        output = source / "VOL001_LOAD"
+    repo = Path(args.repo).resolve() if args.repo else Path(__file__).resolve().parents[1]
+    schema_file = repo / "schemas" / "davila_load.txt"
+    csv_path = source / args.csv_name
+    data_dir_name = (getattr(args, "data_dir", "") or "").strip().strip("\\/")
+    if not data_dir_name and (output / "DATA").is_dir():
+        data_dir_name = "DATA"
+    data_out = output / data_dir_name if data_dir_name else output
+
+    if not csv_path.is_file():
+        print(f"ERROR: CSV not found: {csv_path}", file=sys.stderr)
+        return 1
+    if not schema_file.is_file():
+        print(f"ERROR: schema not found: {schema_file}", file=sys.stderr)
+        return 1
+
+    _, thin_rows = load_csv_rows(csv_path)
+    print(f"Bates-join rebuild: {len(thin_rows)} CSV rows -> {output}")
+
+    # Prefer package indexes (already Bates-named); fall back to source.
+    pkg_native_idx = index_by_stem(output / "NATIVES")
+    pkg_image_idx = index_by_stem(output / "IMAGES")
+    pkg_text_idx = index_by_stem(output / "TEXT")
+    src_native_idx = index_by_stem(source / "NATIVES")
+    src_image_idx = index_by_stem(source / "IMAGES")
+    native_index = merge_stem_indexes(pkg_native_idx, src_native_idx)
+    image_index = merge_stem_indexes(pkg_image_idx, src_image_idx)
+    text_index = pkg_text_idx
+
+    natives_out = output / "NATIVES" / "0001"
+    ensure_dir(natives_out)
+    ensure_dir(data_out)
+
+    # Preserve media children from existing enriched CSV.
+    prior_enriched = data_out / "VOL001_enriched.csv"
+    if not prior_enriched.is_file():
+        prior_enriched = output / "VOL001_enriched.csv"
+    child_rows: List[Dict[str, str]] = []
+    if prior_enriched.is_file():
+        with prior_enriched.open("r", encoding="utf-8-sig", newline="") as fh:
+            for raw in csv.DictReader(fh):
+                row = {k: (raw.get(k) or "") for k in SCHEMA_FIELDS}
+                if (row.get("SOURCEFOLDER") or "").strip():
+                    # Re-assert Bates-centric FILEPATH for children.
+                    beg = row["BEGDOC"].strip()
+                    ext = Path(row["FILEPATH"]).suffix if row["FILEPATH"] else ""
+                    if not ext and row.get("FILEEXT"):
+                        ext = f".{row['FILEEXT'].lstrip('.').lower()}"
+                    # Prefer on-disk native for this child Bates.
+                    nat = native_index.get(beg)
+                    if nat and nat.is_file():
+                        ext = nat.suffix
+                        row["FILEEXT"] = ext.lstrip(".").upper()
+                    row["FILEPATH"] = rel_native_path(beg, ext) if ext else ""
+                    # TEXTPATH must be {BEGDOC}.txt when present.
+                    tp = (row.get("TEXTPATH") or "").strip()
+                    txt = text_index.get(beg)
+                    if txt and txt.is_file():
+                        row["TEXTPATH"] = rel_text_path(beg)
+                    elif tp:
+                        stem = Path(tp.replace("\\", "/")).stem
+                        if stem != beg:
+                            row["TEXTPATH"] = (
+                                rel_text_path(beg) if (natives_out.parent.parent / "TEXT" / "0001" / f"{beg}.txt").is_file() else ""
+                            )
+                    child_rows.append(row)
+        print(f"  Preserved {len(child_rows)} media-child rows from enriched CSV")
+
+    audit_rows: List[Dict[str, str]] = []
+    enriched: List[Dict[str, str]] = []
+    recopied = 0
+    mismatches_fixed = 0
+
+    for r in thin_rows:
+        beg = r["BEGDOC"]
+        filename = r["FILENAME"]
+        join = join_bates_to_files(
+            beg,
+            native_index=native_index,
+            image_index=image_index,
+            text_index=text_index,
+            csv_filename=filename,
+            enddoc=r["ENDDOC"],
+            coded=r["CODED"],
+        )
+        audit_rows.append(audit_bates_join_row(join))
+        filepath, fileext = filepath_from_bates_join(join)
+        textpath = textpath_from_bates_join(join)
+
+        # Fix package native if missing or wrong stem/ext vs Bates join.
+        if join.native_found and join.native is not None:
+            expected = natives_out / f"{beg}{join.native.suffix}"
+            need_copy = False
+            if not expected.is_file():
+                need_copy = True
+            else:
+                try:
+                    if expected.resolve() != join.native.resolve():
+                        # Same Bates name but different source — compare size.
+                        if expected.stat().st_size != join.native.stat().st_size:
+                            need_copy = True
+                            mismatches_fixed += 1
+                except OSError:
+                    need_copy = True
+            # If join found source native but package path differs, place it.
+            if need_copy and not args.dry_run:
+                src_nat = src_native_idx.get(beg) or join.native
+                try:
+                    place_file(src_nat, expected, mode="copy")
+                    recopied += 1
+                    native_index[beg] = expected
+                    filepath, fileext = filepath_from_bates_join(
+                        join_bates_to_files(
+                            beg,
+                            native_index=native_index,
+                            image_index=image_index,
+                            text_index=text_index,
+                            csv_filename=filename,
+                            enddoc=r["ENDDOC"],
+                            coded=r["CODED"],
+                        )
+                    )
+                except OSError as exc:
+                    print(f"  WARN: could not place native {beg}: {exc}")
+
+        is_ph = filename.lower().startswith("placeholder")
+        enriched.append(
+            {
+                "BEGDOC": beg,
+                "ENDDOC": join.enddoc,
+                "BEGATTACH": "",
+                "ENDATTACH": "",
+                "CUSTODIAN": "",
+                "CODED": join.coded,
+                "FILEPATH": filepath,
+                "FILENAME": filename,
+                "FILEEXT": fileext,
+                "TEXTPATH": textpath,
+                "DOCTYPE": doctype_for(filename, False),
+                "SOURCEFOLDER": "",
+            }
+        )
+        _ = is_ph  # placeholders keep blank attach; children carry family
+
+    enriched.extend(child_rows)
+
+    # Verify every TEXTPATH Bates stem == BEGDOC; every FILEPATH stem == BEGDOC.
+    verify_errors: List[str] = []
+    for row in enriched:
+        beg = row["BEGDOC"]
+        fp = row.get("FILEPATH") or ""
+        tp = row.get("TEXTPATH") or ""
+        if fp:
+            stem = Path(fp.replace("\\", "/")).stem
+            if stem != beg:
+                verify_errors.append(f"FILEPATH stem mismatch: {beg} -> {fp}")
+            # Reject paths that look like raw CSV Filename (no Bates).
+            fn = row.get("FILENAME") or ""
+            if fn and beg not in fp and Path(fn).name in fp.replace("\\", "/"):
+                verify_errors.append(f"FILEPATH looks Filename-derived: {beg} -> {fp}")
+        if tp:
+            stem = Path(tp.replace("\\", "/")).stem
+            if stem != beg:
+                verify_errors.append(f"TEXTPATH stem mismatch: {beg} -> {tp}")
+
+    enriched_csv = data_out / "VOL001_enriched.csv"
+    if not args.dry_run:
+        write_enriched_csv(enriched_csv, enriched)
+        dat_out = data_out / "VOL001.dat"
+        opt_out = data_out / "VOL001.opt"
+        try:
+            run_csv_to_dat(repo, enriched_csv, dat_out, schema_file)
+            print(f"  DAT rebuilt: {dat_out}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"ERROR: csv2dat failed: {exc}", file=sys.stderr)
+            traceback.print_exc()
+            return 1
+
+        try:
+            sys.path.insert(0, str(repo))
+            from converter import write_opt  # type: ignore
+
+            opt_records: List[List[str]] = []
+            for row in enriched:
+                beg = row["BEGDOC"]
+                if beg in image_index and image_index[beg].is_file():
+                    # Only original docs with images (children typically have none).
+                    if not (row.get("SOURCEFOLDER") or "").strip():
+                        opt_records.append([beg])
+            if opt_records:
+                n_opt = write_opt(
+                    str(opt_out),
+                    iter(opt_records),
+                    volume=args.volume,
+                    image_ext=".pdf",
+                    pages_per_doc=1,
+                    image_dir="IMAGES\\0001",
+                )
+                print(f"  OPT rebuilt: {n_opt} lines")
+        except Exception as exc:  # noqa: BLE001
+            print(f"ERROR: opt failed: {exc}", file=sys.stderr)
+            traceback.print_exc()
+            return 1
+
+    write_bates_join_report(
+        output / "bates_join_report.md",
+        source=source,
+        output=output,
+        audit_rows=audit_rows,
+        sample_enriched=enriched,
+        dat_rows=len(enriched),
+        media_children=len(child_rows),
+    )
+
+    native_y = sum(1 for a in audit_rows if a["NATIVE_FOUND"] == "Y")
+    image_y = sum(1 for a in audit_rows if a["IMAGE_FOUND"] == "Y")
+    text_y = sum(1 for a in audit_rows if a["TEXT_FOUND"] == "Y")
+    print(f"  Audit: native {native_y}/{len(audit_rows)} image {image_y}/{len(audit_rows)} text {text_y}/{len(audit_rows)}")
+    print(f"  Natives re-copied: {recopied}; mismatches fixed: {mismatches_fixed}")
+    print(f"  Rows: {len(enriched)} (CSV {len(thin_rows)} + children {len(child_rows)})")
+    print(f"  Report: {output / 'bates_join_report.md'}")
+    if verify_errors:
+        print(f"ERROR: {len(verify_errors)} Bates stem verify failures", file=sys.stderr)
+        for e in verify_errors[:20]:
+            print(f"  {e}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entry point."""
     args = parse_args(argv)
+    if args.rebuild_join:
+        return rebuild_bates_join_package(args)
     if args.rebuild_text:
         return rebuild_text_package(args)
     return build_volume(args)
